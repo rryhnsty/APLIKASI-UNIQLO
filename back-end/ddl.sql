@@ -4,11 +4,11 @@ USE Uniqlo;
 -- ======================
 -- CUSTOMER
 -- ======================
-
 CREATE TABLE Customer (
     id_customer VARCHAR(50) PRIMARY KEY,
     nama VARCHAR(100),
     email VARCHAR(100),
+    password VARCHAR(100),
     alamat TEXT,
     no_telepon VARCHAR(20)
 );
