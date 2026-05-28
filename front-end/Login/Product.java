@@ -1,7 +1,4 @@
-package SQLManagement.TugasAkhirBasdat.frontend;
-
-
-
+package Login;
 public class Product {
 
     private String category;

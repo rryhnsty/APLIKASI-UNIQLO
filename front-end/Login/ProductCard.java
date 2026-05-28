@@ -1,11 +1,9 @@
-package SQLManagement.TugasAkhirBasdat.frontend;
-
+package Login;
 
 import java.awt.*;
 import javax.swing.*;
 
 public class ProductCard extends JPanel {
-
     public ProductCard(Product product) {
 
         setLayout(new BorderLayout());
@@ -24,7 +22,6 @@ public class ProductCard extends JPanel {
             imageLabel = new JLabel(new ImageIcon(img));
 
         } else {
-
             imageLabel = new JLabel("NO IMAGE", SwingConstants.CENTER);
             imageLabel.setPreferredSize(new Dimension(180,180));
             imageLabel.setOpaque(true);
