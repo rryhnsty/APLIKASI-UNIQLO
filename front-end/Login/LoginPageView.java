@@ -9,11 +9,10 @@ import javax.swing.*;
 public class LoginPageView extends JFrame {
     Connection conn;
 
-    // Warna-warna yang disesuaikan
-    private static final Color COLOR_LEFT_PANEL = new Color(200, 200, 200); // Abu-abu muda
+    private static final Color COLOR_LEFT_PANEL = new Color(200, 200, 200);
     private static final Color COLOR_RIGHT_PANEL = Color.WHITE;
-    private static final Color COLOR_RED_BRAND = new Color(200, 30, 40); // Merah khas
-    private static final Color COLOR_RED_HOVER = new Color(160, 20, 30); // Merah lebih gelap untuk hover
+    private static final Color COLOR_RED_BRAND = new Color(200, 30, 40);
+    private static final Color COLOR_RED_HOVER = new Color(160, 20, 30);
     private static final Color COLOR_TEXT_GRAY = new Color(100, 100, 100);
     private static final Color COLOR_INPUT_BG = new Color(240, 240, 240);
     private static final Color COLOR_INPUT_BORDER = new Color(220, 220, 220);
@@ -21,34 +20,32 @@ public class LoginPageView extends JFrame {
     public LoginPageView() {
         setTitle("Login Page - Style Connect");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 700); // Ukuran default, bisa disesuaikan
-        setLocationRelativeTo(null); // Center screen
-        setExtendedState(JFrame.MAXIMIZED_BOTH); // Fullscreen saat start
+        setSize(1000, 700);
+        setLocationRelativeTo(null);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLayout(new BorderLayout());
 
-        // --- PANEL KIRI ---
         JPanel leftPanel = new JPanel();
         leftPanel.setBackground(COLOR_LEFT_PANEL);
         leftPanel.setLayout(new GridBagLayout());
-        leftPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50)); // Padding
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
 
         GridBagConstraints gbcLeft = new GridBagConstraints();
         gbcLeft.gridx = 0;
         gbcLeft.gridy = 0;
-        gbcLeft.anchor = GridBagConstraints.SOUTHWEST; // Mulai dari pojok kiri bawah
+        gbcLeft.anchor = GridBagConstraints.SOUTHWEST;
         gbcLeft.weightx = 1.0;
-        gbcLeft.weighty = 1.0; // Ambil sisa ruang vertikal
+        gbcLeft.weighty = 1.0;
 
-        // Judul besar "Aesthetics Refined."
         JLabel titleLabel = new JLabel("Bismillah BasDat Nilai A");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 48));
         titleLabel.setForeground(Color.BLACK);
         leftPanel.add(titleLabel, gbcLeft);
 
-        // Deskripsi kecil
         gbcLeft.gridy = 1;
-        gbcLeft.weighty = 0; // Tidak mengambil ruang vertikal tambahan
-        gbcLeft.insets = new Insets(20, 0, 0, 0); // Margin top
+        gbcLeft.weighty = 0;
+        gbcLeft.insets = new Insets(20, 0, 0, 0);
+
         JTextArea descLabel = new JTextArea("so if you care to find me, look to the western skyyyy");
         descLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         descLabel.setForeground(COLOR_TEXT_GRAY);
@@ -56,22 +53,20 @@ public class LoginPageView extends JFrame {
         descLabel.setWrapStyleWord(true);
         descLabel.setEditable(false);
         descLabel.setOpaque(false);
-        descLabel.setColumns(25); // Atur lebar textarea
+        descLabel.setColumns(25);
         leftPanel.add(descLabel, gbcLeft);
 
-        // --- PANEL KANAN ---
         JPanel rightPanel = new JPanel();
         rightPanel.setBackground(COLOR_RIGHT_PANEL);
         rightPanel.setLayout(new GridBagLayout());
-        rightPanel.setBorder(BorderFactory.createEmptyBorder(80, 80, 80, 80)); // Padding
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(80, 80, 80, 80));
 
         GridBagConstraints gbcRight = new GridBagConstraints();
         gbcRight.gridx = 0;
         gbcRight.gridy = 0;
-        gbcRight.anchor = GridBagConstraints.NORTH; // Center horizontal, top vertical
-        gbcRight.weighty = 0.1; // Ruang kosong di atas
+        gbcRight.anchor = GridBagConstraints.NORTH;
+        gbcRight.weighty = 0.1;
 
-        // Logo (Fiktif)
         JLabel logoLabel = new JLabel("STYLE CONNECT");
         logoLabel.setFont(new Font("Arial", Font.BOLD, 24));
         logoLabel.setForeground(COLOR_RED_BRAND);
@@ -79,16 +74,15 @@ public class LoginPageView extends JFrame {
 
         gbcRight.gridy = 1;
         gbcRight.weighty = 0;
-        gbcRight.insets = new Insets(40, 0, 0, 0); // Margin top
+        gbcRight.insets = new Insets(40, 0, 0, 0);
 
-        // "Welcome Back"
         JLabel welcomeLabel = new JLabel("Welcome Back");
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 36));
         rightPanel.add(welcomeLabel, gbcRight);
 
         gbcRight.gridy = 2;
         gbcRight.insets = new Insets(10, 0, 0, 0);
-        // "Enter your details..."
+
         JLabel detailsLabel = new JLabel("Enter your details to access your account.");
         detailsLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         detailsLabel.setForeground(COLOR_TEXT_GRAY);
@@ -96,7 +90,7 @@ public class LoginPageView extends JFrame {
 
         gbcRight.gridy = 3;
         gbcRight.insets = new Insets(40, 0, 0, 0);
-        // --- User/Admin Switcher ---
+
         JPanel switcherPanel = new JPanel(new GridLayout(1, 2));
         switcherPanel.setOpaque(false);
         switcherPanel.setPreferredSize(new Dimension(300, 40));
@@ -109,7 +103,7 @@ public class LoginPageView extends JFrame {
 
         JButton adminBtn = new JButton("Admin");
         adminBtn.setFocusPainted(false);
-        adminBtn.setBackground(COLOR_RIGHT_PANEL); // Admin default
+        adminBtn.setBackground(COLOR_RIGHT_PANEL);
         adminBtn.setForeground(COLOR_TEXT_GRAY);
         adminBtn.setBorder(BorderFactory.createLineBorder(COLOR_INPUT_BORDER));
 
@@ -117,45 +111,42 @@ public class LoginPageView extends JFrame {
         switcherPanel.add(adminBtn);
         rightPanel.add(switcherPanel, gbcRight);
 
-        // --- Form Inputs ---
         gbcRight.gridy = 4;
         gbcRight.insets = new Insets(30, 0, 0, 0);
-        gbcRight.fill = GridBagConstraints.HORIZONTAL; // Buat input selebar panel
+        gbcRight.fill = GridBagConstraints.HORIZONTAL;
         gbcRight.weightx = 1.0;
 
-        // Email
         JPanel emailFieldPanel = createInputField("Email", "ryanunjukkebolehan@gmail.com");
         rightPanel.add(emailFieldPanel, gbcRight);
 
-        // Password + Forgot Password?
         gbcRight.gridy = 5;
         gbcRight.insets = new Insets(20, 0, 0, 0);
+
         JPanel passwordFieldPanel = createPasswordField("Password", "mas ryan unuk kebolehan");
         rightPanel.add(passwordFieldPanel, gbcRight);
 
-        // Remember me
         gbcRight.gridy = 6;
         gbcRight.insets = new Insets(15, 0, 0, 0);
         gbcRight.fill = GridBagConstraints.NONE;
         gbcRight.anchor = GridBagConstraints.WEST;
+
         JCheckBox rememberMe = new JCheckBox("Remember me");
         rememberMe.setFont(new Font("Arial", Font.PLAIN, 14));
         rememberMe.setOpaque(false);
         rightPanel.add(rememberMe, gbcRight);
 
-        // --- Tombol 'Sign In' ---
         gbcRight.gridy = 7;
         gbcRight.insets = new Insets(40, 0, 0, 0);
         gbcRight.fill = GridBagConstraints.HORIZONTAL;
         gbcRight.anchor = GridBagConstraints.CENTER;
+
         JButton signInBtn = new JButton("Sign In");
         signInBtn.setFont(new Font("Arial", Font.BOLD, 18));
         signInBtn.setForeground(Color.WHITE);
         signInBtn.setBackground(COLOR_RED_BRAND);
         signInBtn.setFocusPainted(false);
-        signInBtn.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0)); // Padding dalam tombol
+        signInBtn.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
 
-        // **EFEK HOVER** (Menggelapkan tombol saat kursor di atasnya)
         signInBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -167,19 +158,20 @@ public class LoginPageView extends JFrame {
                 signInBtn.setBackground(COLOR_RED_BRAND);
             }
         });
+
         rightPanel.add(signInBtn, gbcRight);
 
-        // --- Link Sign Up ---
         gbcRight.gridy = 8;
         gbcRight.insets = new Insets(30, 0, 0, 0);
         gbcRight.fill = GridBagConstraints.NONE;
         gbcRight.anchor = GridBagConstraints.CENTER;
-        gbcRight.weighty = 0.1; // Ruang kosong di bawah
+        gbcRight.weighty = 0.1;
 
         JLabel signUpLink = new JLabel("<html>Don't have an account? <span style='color: rgb(200,30,40);'>Sign Up</span></html>");
         signUpLink.setFont(new Font("Arial", Font.PLAIN, 14));
         signUpLink.setForeground(COLOR_TEXT_GRAY);
-        signUpLink.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Ubah kursor jadi tangan
+        signUpLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         rightPanel.add(signUpLink, gbcRight);
 
         signUpLink.addMouseListener(new MouseAdapter() {
@@ -190,15 +182,14 @@ public class LoginPageView extends JFrame {
             }
         });
 
-        // Tambahkan kedua panel ke frame utama
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
-        splitPane.setDividerLocation(0.5); // Bagi 50/50
-        splitPane.setDividerSize(0); // Sembunyikan garis pembagi
-        splitPane.setEnabled(false); // Matikan kemampuan drag pembagi
+        splitPane.setDividerLocation(0.5);
+        splitPane.setDividerSize(0);
+        splitPane.setEnabled(false);
+
         add(splitPane, BorderLayout.CENTER);
     }
 
-    // Metode bantuan untuk membuat panel input field yang bersih
     private JPanel createInputField(String labelText, String placeholder) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
@@ -206,26 +197,29 @@ public class LoginPageView extends JFrame {
         JLabel label = new JLabel(labelText);
         label.setFont(new Font("Arial", Font.BOLD, 14));
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+
         panel.add(label, BorderLayout.NORTH);
 
         JTextField textField = new JTextField(placeholder);
         textField.setFont(new Font("Arial", Font.PLAIN, 16));
         textField.setBackground(COLOR_INPUT_BG);
+
         textField.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(COLOR_INPUT_BORDER),
-                BorderFactory.createEmptyBorder(10, 10, 10, 10) // Padding dalam
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
+
         panel.add(textField, BorderLayout.CENTER);
 
         return panel;
     }
 
-    // Metode bantuan untuk membuat panel password field dengan link 'Forgot Password?'
     private JPanel createPasswordField(String labelText, String placeholder) {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setOpaque(false);
 
         GridBagConstraints gbc = new GridBagConstraints();
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
@@ -234,20 +228,23 @@ public class LoginPageView extends JFrame {
         JLabel label = new JLabel(labelText);
         label.setFont(new Font("Arial", Font.BOLD, 14));
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+
         panel.add(label, gbc);
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.weightx = 0;
+
         JLabel forgotLink = new JLabel("Forgot Password?");
         forgotLink.setFont(new Font("Arial", Font.PLAIN, 12));
         forgotLink.setForeground(COLOR_RED_BRAND);
         forgotLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         panel.add(forgotLink, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridwidth = 2; // Pakai dua kolom
+        gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
         gbc.insets = new Insets(0, 0, 0, 0);
@@ -255,10 +252,12 @@ public class LoginPageView extends JFrame {
         JPasswordField passwordField = new JPasswordField(placeholder);
         passwordField.setFont(new Font("Arial", Font.PLAIN, 16));
         passwordField.setBackground(COLOR_INPUT_BG);
+
         passwordField.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(COLOR_INPUT_BORDER),
-                BorderFactory.createEmptyBorder(10, 10, 10, 10) // Padding dalam
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
+
         panel.add(passwordField, gbc);
 
         return panel;
@@ -278,7 +277,6 @@ public class LoginPageView extends JFrame {
     }
 
     public static void main(String[] args) {
-        // Jalankan GUI di event dispatch thread
         SwingUtilities.invokeLater(() -> {
             LoginPageView view = new LoginPageView();
             view.setVisible(true);
