@@ -1,9 +1,11 @@
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.*;
+import javax.swing.*;
 
 public class LoginPageView extends JFrame {
+    Connection conn;
 
     // Warna-warna yang disesuaikan
     private static final Color COLOR_LEFT_PANEL = new Color(200, 200, 200); // Abu-abu muda
@@ -250,6 +252,32 @@ public class LoginPageView extends JFrame {
         panel.add(passwordField, gbc);
 
         return panel;
+    }
+
+    private void getCOnnection() {
+        try {
+            String url = "jdbc:sqlserver://localhost:1433;databaseName=Uniqlo;encrypt=true;trustServerCertificate=true";
+            String user = "sa";
+            String password = "revanna16";
+
+            conn = DriverManager.getConnection(url, user, password);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+    }
+
+    void buatAkun() {
+        try {
+            String sql = "INSERT INTO Customer VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            JOptionPane.showMessageDialog(null, "Data berhasil ditambah");
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
     }
 
     public static void main(String[] args) {
