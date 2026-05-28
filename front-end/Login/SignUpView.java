@@ -20,7 +20,7 @@ public class SignUpView extends JDialog {
     private Connection conn;
 
     public SignUpView(JFrame parent) {
-        super(parent, "Sign Up - Style Connect", true);
+        super(parent, "Sign Up", true);
         setSize(500, 550);
         setLocationRelativeTo(parent);
         setLayout(new GridBagLayout());
@@ -105,7 +105,7 @@ public class SignUpView extends JDialog {
                 BorderFactory.createLineBorder(COLOR_INPUT_BORDER),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
             ));
-            if (labelText.equals("Password"))        passwordField = pf;
+            if (labelText.equals("Password")) passwordField = pf;
             else if (labelText.equals("Confirm Password")) confirmPasswordField = pf;
             field = pf;
         } else {
@@ -124,41 +124,77 @@ public class SignUpView extends JDialog {
     }
 
     private void handleRegister() {
-        String email    = emailField.getText().trim();
-        String password = new String(passwordField.getPassword());
-        String confirm  = new String(confirmPasswordField.getPassword());
 
-        if (email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Semua field harus diisi.", "Peringatan", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        if (!password.equals(confirm)) {
-            JOptionPane.showMessageDialog(this, "Password dan Confirm Password tidak cocok.", "Peringatan", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        if (conn == null) {
-            JOptionPane.showMessageDialog(this, "Koneksi database gagal.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+    String email = emailField.getText().trim();
+    String password = new String(passwordField.getPassword());
+    String confirm = new String(confirmPasswordField.getPassword());
 
-        try {
-            String sql = "INSERT INTO Customer (email, password) VALUES (?, ?)";
+    if (email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Semua field harus diisi.", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    if (!password.equals(confirm)) {
+        JOptionPane.showMessageDialog(this, "Password dan Confirm Password tidak cocok.", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    if (conn == null) {
+        JOptionPane.showMessageDialog(this, "Koneksi database gagal.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    try {
+        String lastId = "C000";
+
+        String getIdSql = "SELECT TOP 1 id_customer FROM Customer ORDER BY id_customer DESC";
+
+        Statement st = conn.createStatement();
+        ResultSet rs = st.executeQuery(getIdSql);
+
+            if (rs.next()) {
+                lastId = rs.getString("id_customer");
+            }
+
+            int angka = Integer.parseInt(lastId.substring(1));
+
+            angka++;
+
+            String newId = String.format("C%03d", angka);
+
+            String sql = "INSERT INTO Customer VALUES (?, NULL, ?, ?, NULL, NULL)";
+
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, email);
-            ps.setString(2, password);
+
+            ps.setString(1, newId);
+            ps.setString(2, email);
+            ps.setString(3, password);
+
             ps.executeUpdate();
 
-            JOptionPane.showMessageDialog(this, "Akun berhasil dibuat! Silakan login.", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(
+                this,
+                "Akun berhasil dibuat!\nID Customer: " + newId,
+                "Sukses",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+
             dispose();
+
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                this,
+                ex.getMessage(),
+                "Database Error",
+                JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
     private void getConnection() {
         try {
             String url = "jdbc:sqlserver://localhost:1433;databaseName=Uniqlo;encrypt=true;trustServerCertificate=true";
-            conn = DriverManager.getConnection(url, "sa", "");
+            conn = DriverManager.getConnection(url, "sa", "revanna16");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
         }
