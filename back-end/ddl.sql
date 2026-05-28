@@ -6,11 +6,11 @@ USE Uniqlo;
 -- ======================
 CREATE TABLE Customer (
     id_customer VARCHAR(50) PRIMARY KEY,
-    nama VARCHAR(100),
-    email VARCHAR(100),
-    password VARCHAR(100),
-    alamat TEXT,
-    no_telepon VARCHAR(20)
+    nama VARCHAR(100) NULL,
+    email VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    alamat TEXT NULL,
+    no_telepon VARCHAR(20) NULL
 );
 
 -- ======================
