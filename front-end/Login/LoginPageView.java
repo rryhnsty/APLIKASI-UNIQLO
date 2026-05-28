@@ -277,19 +277,6 @@ public class LoginPageView extends JFrame {
         }
     }
 
-    void buatAkun() {
-        try {
-            String sql = "INSERT INTO Customer VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-            PreparedStatement ps = conn.prepareStatement(sql);
-
-            JOptionPane.showMessageDialog(null, "Data berhasil ditambah");
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
-        }
-    }
-
     public static void main(String[] args) {
         // Jalankan GUI di event dispatch thread
         SwingUtilities.invokeLater(() -> {
