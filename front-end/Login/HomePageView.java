@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 public class HomePageView extends JFrame {
-
     public HomePageView() {
 
         setTitle("JEKI Store");
@@ -23,12 +22,17 @@ public class HomePageView extends JFrame {
         navbar.setBackground(Color.WHITE);
         navbar.setBorder(BorderFactory.createEmptyBorder(10,20,10,20));
 
-        JLabel logo = new JLabel("JEKI");
-        logo.setFont(new Font("Arial", Font.BOLD, 26));
-        logo.setForeground(new Color(200,30,40));
+        ImageIcon logoIcon = new ImageIcon("images/logo-jeki.png");
+        Image logoImg = logoIcon.getImage().getScaledInstance(90, 40, Image.SCALE_SMOOTH);
+        JLabel logo = new JLabel(new ImageIcon(logoImg));
+        logo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20)); // Memberikan jarak di sebelah kanan logo agar tidak bertabrakan dengan textfield
 
         JTextField searchField = new JTextField("Cari produk...");
-        searchField.setPreferredSize(new Dimension(300,40));
+        searchField.setPreferredSize(new Dimension(500,40));
+        searchField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createEmptyBorder(0, 20, 0, 0),
+            searchField.getBorder()
+        ));
 
         navbar.add(logo, BorderLayout.WEST);
         navbar.add(searchField, BorderLayout.CENTER);
