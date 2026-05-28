@@ -1,9 +1,6 @@
 CREATE DATABASE Uniqlo;
 USE Uniqlo;
 
--- ======================
--- CUSTOMER
--- ======================
 CREATE TABLE Customer (
     id_customer VARCHAR(50) PRIMARY KEY,
     nama VARCHAR(100) NULL,
@@ -13,10 +10,6 @@ CREATE TABLE Customer (
     no_telepon VARCHAR(20) NULL
 );
 
--- ======================
--- ADMIN
--- ======================
-
 CREATE TABLE Admin (
     id_admin VARCHAR(50) PRIMARY KEY,
     nama_admin VARCHAR(100),
@@ -25,18 +18,10 @@ CREATE TABLE Admin (
     no_hp VARCHAR(20)
 );
 
--- ======================
--- CATEGORY
--- ======================
-
 CREATE TABLE Category (
     id_category VARCHAR(50) PRIMARY KEY,
     nama_kategori VARCHAR(100)
 );
-
--- ======================
--- PRODUCT
--- ======================
 
 CREATE TABLE Product (
     id_product VARCHAR(50) PRIMARY KEY,
@@ -47,10 +32,6 @@ CREATE TABLE Product (
     ukuran VARCHAR(50),
     warna VARCHAR(50)
 );
-
--- ======================
--- PRODUCT CATEGORY
--- ======================
 
 CREATE TABLE Product_Category (
     id_product VARCHAR(50),
@@ -65,20 +46,12 @@ CREATE TABLE Product_Category (
     REFERENCES Category(id_category)
 );
 
--- ======================
--- ORDERS
--- ======================
-
 CREATE TABLE Orders (
     id_order VARCHAR(50) PRIMARY KEY,
     tanggal_order DATE,
     subtotal DECIMAL(12,2),
     status_order VARCHAR(100)
 );
-
--- ======================
--- ORDER DETAIL
--- ======================
 
 CREATE TABLE OrderDetail (
     id_order VARCHAR(50),
@@ -96,10 +69,6 @@ CREATE TABLE OrderDetail (
     REFERENCES Product(id_product)
 );
 
--- ======================
--- PAYMENT
--- ======================
-
 CREATE TABLE Payment (
     id_payment VARCHAR(50) PRIMARY KEY,
     alamat TEXT,
@@ -110,10 +79,6 @@ CREATE TABLE Payment (
     subtotal DECIMAL(12,2)
 );
 
--- ======================
--- INVOICES
--- ======================
-
 CREATE TABLE Invoices (
     id_invoices VARCHAR(50) PRIMARY KEY,
     tanggal_pesan DATE,
@@ -122,10 +87,6 @@ CREATE TABLE Invoices (
     status_pembayaran VARCHAR(100),
     nama_jasa_kirim VARCHAR(100)
 );
-
--- ======================
--- SHIPMENT
--- ======================
 
 CREATE TABLE Shipment (
     id_shipment VARCHAR(50) PRIMARY KEY,
