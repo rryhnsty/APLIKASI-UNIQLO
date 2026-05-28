@@ -356,8 +356,9 @@ public class LoginPageView extends JFrame {
                     "Login berhasil!\nSelamat datang, " + email + "\nID: " + customerId,
                     "Sukses", JOptionPane.INFORMATION_MESSAGE);
                 // TODO: buka halaman utama customer
-                // new CustomerDashboard(customerId).setVisible(true);
-                // dispose();
+               HomPageView home = new HomPageView();
+                home.setVisible(true);
+                dispose();
             }
 
         } catch (SQLException ex) {
