@@ -1,3 +1,5 @@
+package Login;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -180,6 +182,14 @@ public class LoginPageView extends JFrame {
         signUpLink.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Ubah kursor jadi tangan
         rightPanel.add(signUpLink, gbcRight);
 
+        signUpLink.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                SignUpView signUpView = new SignUpView(LoginPageView.this);
+                signUpView.setVisible(true);
+            }
+        });
+
         // Tambahkan kedua panel ke frame utama
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
         splitPane.setDividerLocation(0.5); // Bagi 50/50
@@ -254,7 +264,7 @@ public class LoginPageView extends JFrame {
         return panel;
     }
 
-    private void getCOnnection() {
+    private void getConnection() {
         try {
             String url = "jdbc:sqlserver://localhost:1433;databaseName=Uniqlo;encrypt=true;trustServerCertificate=true";
             String user = "sa";
