@@ -6,12 +6,11 @@ import javax.swing.*;
 
 public class ProductCard extends JPanel {
 
-    public ProductCard(Product product) {
+    public ProductCard(Product product, String customerId) {
 
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
-        // ukuran card tetap
         setPreferredSize(new Dimension(250, 420));
 
         setBorder(BorderFactory.createCompoundBorder(
@@ -32,12 +31,7 @@ public class ProductCard extends JPanel {
         if(product.getImagePath() != null &&
            !product.getImagePath().isEmpty()) {
 
-            // debug cek file
-            System.out.println(product.getImagePath());
-
             File file = new File(product.getImagePath());
-
-            System.out.println(file.exists());
 
             if(file.exists()) {
 
@@ -128,6 +122,24 @@ public class ProductCard extends JPanel {
         cartBtn.setMaximumSize(
                 new Dimension(Integer.MAX_VALUE,40)
         );
+
+        // ================= ADD TO CART =================
+
+        cartBtn.addActionListener(e -> {
+
+            CartManager.getInstance().setCustomerId(customerId);
+
+            CartManager.getInstance().addItem(
+                    product,
+                    1,
+                    "M"
+            );
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    product.getName() + " berhasil ditambahkan ke cart"
+            );
+        });
 
         // tambah component
         infoPanel.add(category);

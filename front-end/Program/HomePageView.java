@@ -112,7 +112,10 @@ public class HomePageView extends JFrame {
         cartButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new CartView().setVisible(true);
+
+                CartView cart = new CartView(customerId);
+
+                cart.setVisible(true);
             }
         });
 
@@ -189,8 +192,7 @@ public class HomePageView extends JFrame {
         products.add(new Product("P020", "HeatTech Extra Warm Leggings", "Rp 349.000", "images/p020.png"));
 
         for(Product p : products) {
-
-            productGrid.add(new ProductCard(p));
+            productGrid.add(new ProductCard(p, customerId));
 
         }
 
