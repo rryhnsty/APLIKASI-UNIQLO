@@ -57,6 +57,7 @@ public class CartView extends JFrame {
         cartContainer.setBackground(new Color(245,245,245));
 
         JScrollPane scrollPane = new JScrollPane(cartContainer);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.setBorder(null);
 
         mainPanel.add(scrollPane, BorderLayout.CENTER);
