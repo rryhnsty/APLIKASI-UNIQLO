@@ -134,11 +134,6 @@ public class ProductCard extends JPanel {
                     1,
                     "M"
             );
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    product.getName() + " berhasil ditambahkan ke cart"
-            );
         });
 
         // tambah component
