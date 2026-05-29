@@ -356,7 +356,7 @@ public class LoginPageView extends JFrame {
                     "Login berhasil!\nSelamat datang, " + email + "\nID: " + customerId,
                     "Sukses", JOptionPane.INFORMATION_MESSAGE);
                 // TODO: buka halaman utama customer
-                HomePageView home = new HomePageView();
+                HomePageView home = new HomePageView(customerId);
                 home.setVisible(true);
                 dispose();
             }

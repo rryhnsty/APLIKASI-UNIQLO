@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 public class HomePageView extends JFrame {
-
-    public HomePageView() {
-
+    private String customerId;
+    
+    public HomePageView(String customerId) {
+        this.customerId = customerId;
+        
         setTitle("JEKI Store");
         setSize(1000, 700);
         setLocationRelativeTo(null);
@@ -117,7 +119,7 @@ public class HomePageView extends JFrame {
         profileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new ProfileView().setVisible(true);
+                new ProfileView(customerId).setVisible(true);
             }
         });
 
