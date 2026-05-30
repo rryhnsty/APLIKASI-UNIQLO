@@ -128,7 +128,7 @@ public class ProfileView extends JFrame {
         namaField.setPreferredSize(new Dimension(250,35));
         formPanel.add(namaField, gbc);
 
-        // teleponField
+       
         gbc.gridx = 1;
         teleponField = new JTextField();
         teleponField.setPreferredSize(new Dimension(250,35));
