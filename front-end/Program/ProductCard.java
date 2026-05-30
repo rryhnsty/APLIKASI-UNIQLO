@@ -126,14 +126,15 @@ public class ProductCard extends JPanel {
         // ================= ADD TO CART =================
 
         cartBtn.addActionListener(e -> {
-
-            CartManager.getInstance().setCustomerId(customerId);
-
-            CartManager.getInstance().addItem(
-                    product,
-                    1,
-                    "M"
-            );
+            boolean success = CartDataAccess.addToCart(customerId, product.getCategory());
+            if (!success) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Gagal menambahkan produk ke keranjang.",
+                        "Koneksi Gagal",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
         });
 
         // tambah component

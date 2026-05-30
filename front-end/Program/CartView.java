@@ -71,7 +71,7 @@ public class CartView extends JFrame {
         totalLabel = new JLabel("Total : Rp 0");
         totalLabel.setFont(new Font("Arial", Font.BOLD, 24));
 
-        JButton checkoutButton = new JButton("Checkout");
+        JButton checkoutButton = new JButton("Pembayaran");
 
         checkoutButton.setBackground(Color.BLACK);
         checkoutButton.setForeground(Color.WHITE);
@@ -79,14 +79,18 @@ public class CartView extends JFrame {
         checkoutButton.setPreferredSize(new Dimension(180,50));
 
         checkoutButton.addActionListener(e -> {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Checkout berhasil!",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
+            java.util.List<CartItem> items = CartDataAccess.getCartItems(customerId);
+            if (items.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Keranjang belanja Anda kosong!",
+                        "Peringatan",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+            new PaymentView(customerId).setVisible(true);
+            dispose();
         });
 
         footerPanel.add(totalLabel, BorderLayout.WEST);
@@ -108,7 +112,7 @@ public class CartView extends JFrame {
         grandTotal = 0;
 
         java.util.List<CartItem> items =
-                CartManager.getInstance().getItems();
+                CartDataAccess.getCartItems(customerId);
 
         if(items.isEmpty()) {
 
@@ -140,6 +144,7 @@ public class CartView extends JFrame {
                 grandTotal += subtotal;
 
                 JPanel itemPanel = createCartItem(
+                        item.getCartItemId(),
                         p.getCategory(),
                         p.getName(),
                         p.getPrice(),
@@ -166,6 +171,7 @@ public class CartView extends JFrame {
     // ================= CART ITEM =================
 
     private JPanel createCartItem(
+            int cartItemId,
             String productId,
             String productName,
             String productPrice,
@@ -238,7 +244,7 @@ public class CartView extends JFrame {
 
         deleteButton.addActionListener(e -> {
 
-            removeCartItem(productId);
+            removeCartItem(cartItemId);
 
         });
 
@@ -251,33 +257,21 @@ public class CartView extends JFrame {
 
     // ================= REMOVE ITEM =================
 
-    private void removeCartItem(String productId) {
-
-        java.util.List<CartItem> items =
-                CartManager.getInstance().getItems();
-
-        CartItem target = null;
-
-        for(CartItem item : items) {
-
-            if(item.getProduct().getCategory().equals(productId)) {
-
-                target = item;
-
-                break;
-            }
-        }
-
-        if(target != null) {
-
-            CartManager.getInstance().removeItem(target);
-
+    private void removeCartItem(int cartItemId) {
+        boolean success = CartDataAccess.removeCartItem(cartItemId);
+        if (success) {
             JOptionPane.showMessageDialog(
                     this,
-                    "Produk dihapus dari cart"
+                    "Produk berhasil dihapus dari cart"
             );
-
             loadCartData();
+        } else {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Gagal menghapus produk dari cart",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }   
 
@@ -299,28 +293,7 @@ public class CartView extends JFrame {
                 .replace(",", ".");
     }
 
-    // ================= DATABASE =================
-
     private void getConnection() {
-
-        try {
-
-            String url =
-                    "jdbc:sqlserver://localhost:1433;databaseName=Uniqlo;encrypt=true;trustServerCertificate=true";
-
-            conn = DriverManager.getConnection(
-                    url,
-                    "sa",
-                    "revanna16"
-            );
-
-        } catch(Exception e) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Database Error : " + e.getMessage()
-            );
-
-        }
+        conn = DatabaseHelper.getConnection();
     }
 }
