@@ -5,18 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 
-/**
- * CartDataAccess.java
- * Data Access Object untuk operasi database tabel Cart, Product, dan Transaksi.
- *
- * PERUBAHAN:
- *  - processPaymentTransaction() menyimpan snapshot Cart ke TransaksiDetail
- *    SEBELUM Cart dihapus → ShipmentView bisa tampilkan detail produk per baris.
- *  - Ditambahkan getLastTransaksiDetail() untuk ShipmentView.
- */
-public class CartDataAccess {
 
-    // ================= ADD TO CART =================
+public class CartDataAccess {
     public static boolean addToCart(String idCustomer, String idProduct) {
         Connection conn = DatabaseHelper.getConnection();
         if (conn == null) return false;
@@ -29,7 +19,6 @@ public class CartDataAccess {
         ResultSet rsCheckCart    = null;
 
         try {
-            // 1. Ambil harga produk
             psCheckProduct = conn.prepareStatement(
                 "SELECT harga FROM Product WHERE id_product = ?");
             psCheckProduct.setString(1, idProduct);
@@ -42,8 +31,6 @@ public class CartDataAccess {
                 System.err.println("Produk tidak ditemukan: " + idProduct);
                 return false;
             }
-
-            // 2. Cek apakah produk sudah ada di Cart
             psCheckCart = conn.prepareStatement(
                 "SELECT id_cart, quantity FROM Cart WHERE id_customer = ? AND id_product = ?");
             psCheckCart.setString(1, idCustomer);
@@ -84,8 +71,6 @@ public class CartDataAccess {
             closeQuietly(conn);
         }
     }
-
-    // ================= GET CART ITEMS =================
     public static List<CartItem> getCartItems(String idCustomer) {
         List<CartItem> items = new ArrayList<>();
         Connection conn = DatabaseHelper.getConnection();
@@ -126,7 +111,6 @@ public class CartDataAccess {
         return items;
     }
 
-    // ================= REMOVE CART ITEM =================
     public static boolean removeCartItem(int idCart) {
         Connection conn = DatabaseHelper.getConnection();
         if (conn == null) return false;
@@ -145,17 +129,6 @@ public class CartDataAccess {
         }
     }
 
-    // ================= PROCESS PAYMENT TRANSACTION =================
-    /**
-     * Alur atomik (semua dalam satu SQL Transaction):
-     *  1. Update saldo Admin.
-     *  2. INSERT ke Transaksi → ambil id_transaction baru.
-     *  3. Ambil snapshot Cart (JOIN Product).
-     *  4. Batch INSERT snapshot ke TransaksiDetail.
-     *  5. UPDATE stok dan tambah kolom terjual di Product.
-     *  6. INSERT data shipment ke tabel Shipment.
-     *  7. DELETE Cart customer.
-     */
     public static boolean processPaymentTransaction(
             String idCustomer, double subtotal,
             double uangDibayar, double kembalian,
@@ -179,7 +152,6 @@ public class CartDataAccess {
         try {
             conn.setAutoCommit(false);
 
-            // ── 1. Update saldo Admin A001 ───────────────────────────────────
             psUpdateAdmin = conn.prepareStatement(
                 "UPDATE Admin SET saldo = COALESCE(saldo, 0) + ? WHERE id_admin = 'A001'");
             psUpdateAdmin.setDouble(1, subtotal);
@@ -193,8 +165,6 @@ public class CartDataAccess {
                 psUpdateAdmin.setDouble(1, subtotal);
                 psUpdateAdmin.executeUpdate();
             }
-
-            // ── 2. INSERT ke Transaksi, ambil id_transaction baru ────────────
             psInsertTrans = conn.prepareStatement(
                 "INSERT INTO Transaksi " +
                 "(id_customer, total_belanja, uang_dibayar, kembalian, tanggal_transaksi, status_pengiriman) " +
@@ -214,7 +184,6 @@ public class CartDataAccess {
                 idTransaction = rsInsert.getInt(1);
             }
 
-            // ── 3. Snapshot Cart sebelum dihapus ─────────────────────────────
             psGetCart = conn.prepareStatement(
                 "SELECT c.id_product, p.nama_produk, p.harga, c.quantity, c.total_harga " +
                 "FROM Cart c " +
@@ -223,7 +192,6 @@ public class CartDataAccess {
             psGetCart.setString(1, idCustomer);
             rsCart = psGetCart.executeQuery();
 
-            // ── 4. Batch INSERT ke TransaksiDetail & UPDATE Product ───────────
             if (idTransaction > 0) {
                 psInsertDetail = conn.prepareStatement(
                     "INSERT INTO TransaksiDetail " +
@@ -247,7 +215,6 @@ public class CartDataAccess {
                     psInsertDetail.setDouble(6, rsCart.getDouble("total_harga"));
                     psInsertDetail.addBatch();
 
-                    // Update Product (stok & terjual)
                     psUpdateProduct.setInt(1, qty);
                     psUpdateProduct.setInt(2, qty);
                     psUpdateProduct.setString(3, idProd);
@@ -256,8 +223,6 @@ public class CartDataAccess {
                 psInsertDetail.executeBatch();
                 psUpdateProduct.executeBatch();
             }
-
-            // ── 5. Ambil alamat customer ──────────────────────────────────────
             String alamatCustomer = "Alamat tidak ditentukan";
             psGetCustomerAddress = conn.prepareStatement("SELECT alamat FROM Customer WHERE id_customer = ?");
             psGetCustomerAddress.setString(1, idCustomer);
@@ -266,7 +231,6 @@ public class CartDataAccess {
                 alamatCustomer = rsAddress.getString("alamat");
             }
 
-            // ── 6. Buat data Shipment di tabel Shipment ───────────────────────
             if (idTransaction > 0) {
                 String cleanCourier = courier.replace("&", "").trim();
                 String prefix = cleanCourier.length() >= 3 ? cleanCourier.substring(0, 3).toUpperCase() : "SHP";
@@ -288,7 +252,6 @@ public class CartDataAccess {
                 psInsertShipment.executeUpdate();
             }
 
-            // ── 7. Hapus seluruh Cart customer ───────────────────────────────
             psDeleteCart = conn.prepareStatement(
                 "DELETE FROM Cart WHERE id_customer = ?");
             psDeleteCart.setString(1, idCustomer);
@@ -315,11 +278,6 @@ public class CartDataAccess {
         }
     }
 
-    // ================= GET LAST TRANSAKSI DETAIL (untuk ShipmentView) =================
-    /**
-     * Ambil detail item dari transaksi terakhir customer.
-     * Return: List<Object[]> = { id_product, nama_produk, harga_satuan_fmt, qty, subtotal_fmt }
-     */
     public static List<Object[]> getLastTransaksiDetail(String idCustomer) {
         List<Object[]> rows = new ArrayList<>();
         Connection conn = DatabaseHelper.getConnection();
@@ -360,8 +318,6 @@ public class CartDataAccess {
         }
         return rows;
     }
-
-    // ================= GET LAST TRANSACTION ID =================
     public static int getLastTransactionId(String idCustomer) {
         Connection conn = DatabaseHelper.getConnection();
         if (conn == null) return -1;
@@ -385,7 +341,6 @@ public class CartDataAccess {
         return -1;
     }
 
-    // ================= GET SHIPMENT INFO =================
     public static Object[] getShipmentInfo(int idTransaction) {
         Connection conn = DatabaseHelper.getConnection();
         if (conn == null) return null;
@@ -418,7 +373,6 @@ public class CartDataAccess {
         return null;
     }
 
-    // ================= UPDATE SHIPMENT AND TRANSACTION STATUS =================
     public static boolean updateShipmentAndTransactionStatus(int idTransaction, String status) {
         Connection conn = DatabaseHelper.getConnection();
         if (conn == null) return false;
@@ -428,13 +382,11 @@ public class CartDataAccess {
         try {
             conn.setAutoCommit(false);
 
-            // Update Shipment status
             psShip = conn.prepareStatement("UPDATE Shipment SET status_kirim = ? WHERE id_transaction = ?");
             psShip.setString(1, status);
             psShip.setInt(2, idTransaction);
             psShip.executeUpdate();
 
-            // Update Transaksi status
             psTrans = conn.prepareStatement("UPDATE Transaksi SET status_pengiriman = ? WHERE id_transaction = ?");
             psTrans.setString(1, status);
             psTrans.setInt(2, idTransaction);
@@ -453,7 +405,6 @@ public class CartDataAccess {
         }
     }
 
-    // ================= HELPERS =================
     private static void closeQuietly(AutoCloseable resource) {
         if (resource != null) try { resource.close(); } catch (Exception ignored) {}
     }
