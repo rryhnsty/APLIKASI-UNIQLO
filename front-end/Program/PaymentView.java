@@ -14,12 +14,19 @@ import javax.swing.table.JTableHeader;
  * PaymentView.java
  * Halaman Pembayaran modern yang menampilkan detail invoice, total belanja,
  * input jumlah pembayaran, dan eksekusi transaksi database menggunakan SQL Transaction.
+ *
+ * Alur setelah pembayaran sukses:
+ *  1. Popup "Bukti Pembayaran Sukses" muncul seperti biasa.
+ *  2. User tutup popup → tombol "Bayar Sekarang" berubah jadi "Lihat Status Pengiriman".
+ *  3. User klik tombol → ShipmentView terbuka, PaymentView ditutup.
  */
 public class PaymentView extends JFrame {
 
     private final String customerId;
-    private double grandTotal = 0;
-    
+    private double grandTotal  = 0;
+    private double finalUang   = 0;   // disimpan setelah bayar berhasil
+    private double finalKembal = 0;   // disimpan setelah bayar berhasil
+
     private JLabel totalLabel;
     private JLabel customerIdLabel;
     private JLabel totalItemLabel;
@@ -29,8 +36,13 @@ public class PaymentView extends JFrame {
     private JTable itemTable;
     private DefaultTableModel tableModel;
 
+    // Flag: true setelah transaksi DB berhasil dan popup ditutup
+    private boolean sudahBayar = false;
+
     private static final Color COLOR_RED_BRAND    = new Color(200, 30, 40);
     private static final Color COLOR_RED_HOVER    = new Color(160, 20, 30);
+    private static final Color COLOR_GREEN_BRAND  = new Color(34, 139, 34);
+    private static final Color COLOR_GREEN_HOVER  = new Color(20, 100, 20);
     private static final Color COLOR_TEXT_GRAY    = new Color(100, 100, 100);
     private static final Color COLOR_BG_LIGHT     = new Color(248, 249, 250);
     private static final Color COLOR_INPUT_BG     = new Color(240, 240, 240);
@@ -43,7 +55,7 @@ public class PaymentView extends JFrame {
         setSize(1050, 720);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        
+
         JPanel mainPanel = new JPanel(new BorderLayout(20, 0));
         mainPanel.setBackground(Color.WHITE);
         mainPanel.setBorder(new EmptyBorder(25, 25, 25, 25));
@@ -67,7 +79,7 @@ public class PaymentView extends JFrame {
             BorderFactory.createLineBorder(COLOR_INPUT_BORDER),
             BorderFactory.createEmptyBorder(8, 15, 8, 15)
         ));
-        
+
         backButton.addMouseListener(new MouseAdapter() {
             @Override public void mouseEntered(MouseEvent e) { backButton.setBackground(new Color(245, 245, 245)); }
             @Override public void mouseExited(MouseEvent e)  { backButton.setBackground(Color.WHITE); }
@@ -85,14 +97,13 @@ public class PaymentView extends JFrame {
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setBackground(Color.WHITE);
         leftPanel.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(new Color(230, 230, 230)), 
-            "Detail Barang Belanjaan", 
-            0, 0, 
-            new Font("Arial", Font.BOLD, 15), 
+            BorderFactory.createLineBorder(new Color(230, 230, 230)),
+            "Detail Barang Belanjaan",
+            0, 0,
+            new Font("Arial", Font.BOLD, 15),
             COLOR_RED_BRAND
         ));
 
-        // Setup Tabel Barang
         String[] columns = {"ID Produk", "Nama Produk", "Harga Satuan", "Qty", "Total Harga"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -109,14 +120,12 @@ public class PaymentView extends JFrame {
         itemTable.setShowGrid(false);
         itemTable.setIntercellSpacing(new Dimension(0, 0));
 
-        // Styling Table Header
         JTableHeader tableHeader = itemTable.getTableHeader();
         tableHeader.setFont(new Font("Arial", Font.BOLD, 13));
         tableHeader.setBackground(COLOR_RED_BRAND);
         tableHeader.setForeground(Color.WHITE);
         tableHeader.setPreferredSize(new Dimension(100, 35));
 
-        // Center renderers for numbers
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         itemTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
@@ -147,7 +156,7 @@ public class PaymentView extends JFrame {
         rightPanel.add(summaryTitle);
         rightPanel.add(Box.createVerticalStrut(20));
 
-        // Detail Baris Info (ID Customer, Total Item)
+        // Info (ID Customer, Total Item)
         JPanel infoPanel = new JPanel(new GridLayout(2, 2, 10, 15));
         infoPanel.setOpaque(false);
         infoPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -155,7 +164,7 @@ public class PaymentView extends JFrame {
         JLabel custLabel = new JLabel("ID Customer:");
         custLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         custLabel.setForeground(COLOR_TEXT_GRAY);
-        
+
         customerIdLabel = new JLabel(customerId);
         customerIdLabel.setFont(new Font("Arial", Font.BOLD, 14));
         customerIdLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -172,13 +181,13 @@ public class PaymentView extends JFrame {
         infoPanel.add(customerIdLabel);
         infoPanel.add(itemsCountLabel);
         infoPanel.add(totalItemLabel);
-        
+
         rightPanel.add(infoPanel);
         rightPanel.add(Box.createVerticalStrut(20));
         rightPanel.add(new JSeparator());
         rightPanel.add(Box.createVerticalStrut(20));
 
-        // Subtotal Section
+        // Total Belanja
         JLabel subtotalLabelText = new JLabel("TOTAL BELANJA");
         subtotalLabelText.setFont(new Font("Arial", Font.BOLD, 12));
         subtotalLabelText.setForeground(COLOR_TEXT_GRAY);
@@ -192,7 +201,7 @@ public class PaymentView extends JFrame {
         rightPanel.add(totalLabel);
         rightPanel.add(Box.createVerticalStrut(30));
 
-        // Cash Input Section
+        // Input Nominal
         JLabel cashLabelText = new JLabel("MASUKKAN NOMINAL UANG BAYAR (RP)");
         cashLabelText.setFont(new Font("Arial", Font.BOLD, 12));
         cashLabelText.setForeground(Color.BLACK);
@@ -212,7 +221,10 @@ public class PaymentView extends JFrame {
         rightPanel.add(cashInputField);
         rightPanel.add(Box.createVerticalStrut(35));
 
-        // Pay Button
+        // ================= TOMBOL UTAMA =================
+        // Tombol ini punya DUA fungsi tergantung flag sudahBayar:
+        //   false → "Bayar Sekarang"   (merah)
+        //   true  → "Lihat Status Pengiriman" (hijau)
         payButton = new JButton("Bayar Sekarang");
         payButton.setFont(new Font("Arial", Font.BOLD, 16));
         payButton.setForeground(Color.WHITE);
@@ -224,15 +236,32 @@ public class PaymentView extends JFrame {
         payButton.setBorder(BorderFactory.createEmptyBorder(12, 0, 12, 0));
 
         payButton.addMouseListener(new MouseAdapter() {
-            @Override public void mouseEntered(MouseEvent e) { payButton.setBackground(COLOR_RED_HOVER); }
-            @Override public void mouseExited(MouseEvent e)  { payButton.setBackground(COLOR_RED_BRAND); }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                // Warna hover menyesuaikan state tombol saat itu
+                payButton.setBackground(sudahBayar ? COLOR_GREEN_HOVER : COLOR_RED_HOVER);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                payButton.setBackground(sudahBayar ? COLOR_GREEN_BRAND : COLOR_RED_BRAND);
+            }
         });
-        payButton.addActionListener(e -> handlePayment());
-        
+
+        payButton.addActionListener(e -> {
+            if (sudahBayar) {
+                // State SETELAH bayar: buka ShipmentView
+                new ShipmentView(customerId, grandTotal, finalUang, finalKembal).setVisible(true);
+                dispose();
+            } else {
+                // State SEBELUM bayar: proses pembayaran
+                handlePayment();
+            }
+        });
+
         rightPanel.add(payButton);
         rightPanel.add(Box.createVerticalGlue());
 
-        // Split Layout assembly
+        // Split Layout
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
         splitPane.setDividerLocation(600);
         splitPane.setDividerSize(5);
@@ -242,7 +271,6 @@ public class PaymentView extends JFrame {
         mainPanel.add(splitPane, BorderLayout.CENTER);
         add(mainPanel);
 
-        // Load data on load
         loadInvoiceData();
     }
 
@@ -261,9 +289,9 @@ public class PaymentView extends JFrame {
             totalQty += item.getQuantity();
 
             tableModel.addRow(new Object[]{
-                p.getCategory(), // ID Produk
+                p.getCategory(),
                 p.getName(),
-                p.getPrice(), // Format Rp
+                p.getPrice(),
                 item.getQuantity(),
                 formatRupiah((long) subtotal)
             });
@@ -277,7 +305,7 @@ public class PaymentView extends JFrame {
     private void handlePayment() {
         String cashInputText = cashInputField.getText().trim();
 
-        // 1. Validasi: Tidak boleh kosong
+        // Validasi: tidak boleh kosong
         if (cashInputText.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                 "Masukkan jumlah uang tunai pembayaran terlebih dahulu!",
@@ -286,10 +314,9 @@ public class PaymentView extends JFrame {
             return;
         }
 
-        // 2. Validasi: Harus berupa angka numerik
+        // Validasi: harus angka
         double uangDibayar = 0;
         try {
-            // Hilangkan pemisah ribuan jika user memasukkan titik/koma secara tidak sengaja
             String cleanInput = cashInputText.replace(".", "").replace(",", "");
             uangDibayar = Double.parseDouble(cleanInput);
         } catch (NumberFormatException e) {
@@ -300,7 +327,7 @@ public class PaymentView extends JFrame {
             return;
         }
 
-        // Validasi angka negatif atau nol
+        // Validasi: harus lebih dari 0
         if (uangDibayar <= 0) {
             JOptionPane.showMessageDialog(this,
                 "Jumlah uang pembayaran harus lebih besar dari 0!",
@@ -309,44 +336,60 @@ public class PaymentView extends JFrame {
             return;
         }
 
-        // 3. Validasi: Harus lebih besar atau sama dengan subtotal
+        // Validasi: uang harus cukup
         if (uangDibayar < grandTotal) {
-            double kurangStr = grandTotal - uangDibayar;
+            double kurang = grandTotal - uangDibayar;
             JOptionPane.showMessageDialog(this,
-                "Uang yang dibayarkan kurang dari total belanja!\nKekurangan: " + formatRupiah((long) kurangStr),
+                "Uang yang dibayarkan kurang dari total belanja!\nKekurangan: " + formatRupiah((long) kurang),
                 "Pembayaran Gagal",
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // 4. Hitung Kembalian
         double kembalian = uangDibayar - grandTotal;
 
-        // 5. Jalankan SQL Transaction secara atomic via DAO
-        boolean isSuccess = CartDataAccess.processPaymentTransaction(customerId, grandTotal, uangDibayar, kembalian);
+        // Jalankan SQL Transaction secara atomic via DAO
+        boolean isSuccess = CartDataAccess.processPaymentTransaction(
+                customerId, grandTotal, uangDibayar, kembalian);
 
         if (isSuccess) {
-            // Tampilkan Dialog Bukti Pembayaran Berhasil (Premium Receipt Layout)
-            String message =  "BUKTI PEMBAYARAN SUKSES\n"
-                        + "-----------------------------\n"
-                        + "Customer ID : " + customerId + "\n"
-                        + "Total Belanja: " + formatRupiah((long) grandTotal) + "\n"
-                        + "Uang Dibayar : " + formatRupiah((long) uangDibayar) + "\n"
-                        + "Kembalian    : " + formatRupiah((long) kembalian) + "\n"
-                        + "-----------------------------\n"
-                        + "Terima kasih telah berbelanja di JEKI!";
 
-            JOptionPane.showMessageDialog(this, 
-                message, 
-                "Transaksi Berhasil", 
+            // Simpan nilai agar bisa dikirim ke ShipmentView nantinya
+            finalUang   = uangDibayar;
+            finalKembal = kembalian;
+
+            // ── Popup bukti pembayaran (tetap seperti aslinya) ──────────────
+            String message = "BUKTI PEMBAYARAN SUKSES\n"
+                    + "-----------------------------\n"
+                    + "Customer ID  : " + customerId + "\n"
+                    + "Total Belanja: " + formatRupiah((long) grandTotal) + "\n"
+                    + "Uang Dibayar : " + formatRupiah((long) uangDibayar) + "\n"
+                    + "Kembalian    : " + formatRupiah((long) kembalian) + "\n"
+                    + "-----------------------------\n"
+                    + "Terima kasih telah berbelanja di JEKI!";
+
+            JOptionPane.showMessageDialog(this,
+                message,
+                "Transaksi Berhasil",
                 JOptionPane.INFORMATION_MESSAGE);
 
-            // Kembali ke halaman Home
-            new HomePageView(customerId).setVisible(true);
-            dispose();
+            // ── Setelah popup ditutup: ubah state & tampilan ─────────────────
+            sudahBayar = true;
+
+            // Nonaktifkan input uang & tombol kembali agar tidak bisa bayar ulang
+            cashInputField.setEnabled(false);
+            cashInputField.setBackground(new Color(240, 240, 240));
+            cashInputField.setText("Pembayaran telah selesai");
+            backButton.setEnabled(false);
+
+            // Ubah tombol merah → tombol hijau "Lihat Status Pengiriman"
+            payButton.setText("Lihat Status Pengiriman  \u2192");
+            payButton.setBackground(COLOR_GREEN_BRAND);
+            payButton.setToolTipText("Klik untuk melihat status pengiriman pesanan Anda");
+            payButton.repaint();
 
         } else {
-            // Jika transaksi di database gagal
+            // Transaksi DB gagal
             JOptionPane.showMessageDialog(this,
                 "Terjadi kesalahan sistem saat memproses transaksi database.\nPembayaran di-rollback.",
                 "System Error",

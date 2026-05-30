@@ -54,7 +54,7 @@ public class LoginPageView extends JFrame {
         gbcLeft.weightx  = 1.0;
         gbcLeft.weighty  = 1.0;
 
-        JLabel titleLabel = new JLabel("Bismillah BasDat Nilai A");
+    JLabel titleLabel = new JLabel("JEKI Store");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 48));
         titleLabel.setForeground(Color.BLACK);
         leftPanel.add(titleLabel, gbcLeft);
@@ -63,7 +63,7 @@ public class LoginPageView extends JFrame {
         gbcLeft.weighty = 0;
         gbcLeft.insets  = new Insets(20, 0, 0, 0);
 
-        JTextArea descLabel = new JTextArea("so if you care to find me, look to the western skyyyy");
+        JTextArea descLabel = new JTextArea("Toko Fashion Terlengkap" );
         descLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         descLabel.setForeground(COLOR_TEXT_GRAY);
         descLabel.setLineWrap(true);
