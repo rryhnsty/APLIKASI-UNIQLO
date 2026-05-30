@@ -4,7 +4,7 @@ JEKI Store merupakan aplikasi e-commerce pakaian berbasis desktop yang dikembang
 Aplikasi menyediakan dua jenis akses, yaitu User dan Admin. Pada sisi User, pengguna dapat melihat katalog produk, melakukan transaksi pembelian, serta memantau proses pengiriman pesanan. Sementara itu, Admin dapat mengakses dashboard untuk memantau performa toko melalui informasi total penghasilan, transaksi, produk, dan pelanggan, serta melihat laporan analitik seperti 5 produk terlaris sepanjang waktu, 5 produk terlaris bulan ini, dan 3 produk yang paling sering dibeli bersamaan. Seluruh data dikelola menggunakan database SQL Server dengan penerapan operasi CRUD serta query analitik seperti JOIN, GROUP BY, Subquery, dan fungsi agregasi.
 
 1. **Halaman Login**
-Halaman Login merupakan halaman pertama yang ditampilkan ketika aplikasi dijalankan. Halaman ini berfungsi untuk melakukan autentikasi pengguna sebelum dapat mengakses sistem. Pengguna harus memasukkan email dan password yang telah terdaftar pada database. Selain itu, pengguna juga dapat memilih jenis akun yang digunakan, yaitu sebagai User atau Admin. Sistem akan memvalidasi data yang dimasukkan dengan data yang tersimpan pada database. Jika data sesuai, pengguna akan diarahkan ke halaman utama sesuai hak aksesnya. Apabila data tidak sesuai atau terdapat field yang kosong, sistem akan menampilkan pesan kesalahan.
+Halaman pertama yang ditampilkan ketika aplikasi dijalankan. Halaman ini berfungsi untuk melakukan autentikasi pengguna sebelum dapat mengakses sistem. Pengguna harus memasukkan email dan password yang telah terdaftar pada database. Selain itu, pengguna juga dapat memilih jenis akun yang digunakan, yaitu sebagai User atau Admin. Sistem akan memvalidasi data yang dimasukkan dengan data yang tersimpan pada database. Jika data sesuai, pengguna akan diarahkan ke halaman utama sesuai hak aksesnya. Apabila data tidak sesuai atau terdapat field yang kosong, sistem akan menampilkan pesan kesalahan.
 
 *▫️Fitur yang dapat diakses:*
 - Login User
@@ -25,7 +25,7 @@ Halaman Home merupakan halaman utama yang akan ditampilkan setelah pengguna berh
 - Mengakses halaman keranjang
 
 3. Halaman Detail Produk (Opsional)
-Halaman Detail Produk digunakan untuk menampilkan informasi lengkap mengenai suatu produk yang dipilih pengguna. Informasi yang ditampilkan meliputi gambar produk, nama produk, harga, kategori, stok, ukuran, warna, dan deskripsi produk. Halaman ini membantu pengguna memperoleh informasi lebih rinci sebelum melakukan pembelian.
+Halaman Detail Produk digunakan untuk menampilkan informasi lengkap mengenai suatu produk yang dipilih pengguna. Informasi yang ditampilkan meliputi gambar produk, ID produk, nama produk, kategori, dan harga. Halaman ini membantu pengguna memperoleh informasi lebih rinci sebelum melakukan pembelian.
 
 *▫️Fitur yang dapat diakses:*
 - Menambahkan produk ke keranjang
@@ -43,18 +43,17 @@ Halaman Keranjang Belanja berfungsi untuk menampilkan seluruh produk yang telah 
 - Melanjutkan ke proses checkout
 
 5. Halaman Checkout dan Pembayaran
-
 Halaman Checkout dan Pembayaran digunakan untuk menyelesaikan proses transaksi pembelian. Pada halaman ini sistem menampilkan detail barang yang dibeli beserta ringkasan pembayaran. Pengguna dapat memilih jasa pengiriman yang tersedia dan memasukkan nominal pembayaran. Sistem akan menghitung subtotal, ongkos kirim, total pembayaran, serta kembalian yang diterima pengguna.
 
-Fitur yang dapat diakses:
-Melihat detail pesanan
-Memilih jasa pengiriman
-Melihat subtotal dan total pembayaran
-Melakukan simulasi pembayaran
-Menyelesaikan transaksi
-Menampilkan bukti pembayaran
-6. Halaman Status Pengiriman (Shipment)
+*▫️Fitur yang dapat diakses:*
+- Melihat detail pesanan
+- Memilih jasa pengiriman
+- Melihat subtotal dan total pembayaran
+- Melakukan simulasi pembayaran
+- Menyelesaikan transaksi
+- Menampilkan bukti pembayaran
 
+6. Halaman Status Pengiriman (Shipment)
 Halaman Status Pengiriman digunakan untuk memantau proses pengiriman barang setelah transaksi berhasil dilakukan. Sistem akan menampilkan informasi mengenai status pesanan mulai dari proses pengemasan hingga barang diterima pelanggan. Selain itu ditampilkan juga detail pengiriman seperti nomor resi, jasa kirim, dan informasi pembayaran.
 
 Fitur yang dapat diakses:
