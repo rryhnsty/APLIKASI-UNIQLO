@@ -94,7 +94,7 @@ public class ProfileView extends JFrame {
 
         content.add(Box.createVerticalStrut(30));
 
-        // ================= TITLE =================
+       
 
         JLabel infoTitle = new JLabel("INFORMASI AKUN");
         infoTitle.setFont(new Font("Arial", Font.BOLD, 24));
@@ -102,7 +102,7 @@ public class ProfileView extends JFrame {
         content.add(infoTitle);
         content.add(Box.createVerticalStrut(20));
 
-        // ================= FORM =================
+        
 
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
