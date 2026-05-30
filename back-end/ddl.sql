@@ -124,7 +124,7 @@ CREATE TABLE Cart (
         ON UPDATE CASCADE
 );
 
-CREATE TABLE Transaction (
+CREATE TABLE Transaksi (
     id_transaction INT IDENTITY(1,1) PRIMARY KEY,
     id_customer VARCHAR(50) NOT NULL,
     total_belanja DECIMAL(12,2) NOT NULL,

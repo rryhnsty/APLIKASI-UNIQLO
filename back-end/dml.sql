@@ -377,7 +377,19 @@ INSERT INTO Shipment VALUES
 ('SHP049','ORD049','Jl. Raya Pondok Indah No.6, Jakarta Selatan','2026-12-08','Menunggu Pengantaran','SiCepat','SC3037894756',2000),
 ('SHP050','ORD050','Jl. Raya Fatmawati No.15, Jakarta Selatan','2026-12-22','Menunggu Pengantaran','SiCepat','SC2240364141',2000);
 
+INSERT INTO Admin (id_admin, nama_admin,email, password, no_hp)
+VALUES ('ADM006', 'abc', 'abc', 'abc', 1);
+
 SELECT * FROM Orders;
 SELECT * FROM Payment;
 SELECT * FROM Product;
+
 SELECT * FROM Customer;
+
+--untuk cek pengantaran barang yang dipesan
+SELECT * FROM Shipment;
+
+SELECT * FROM Invoices
+
+--untuk cek Transaksi
+SELECT * FROM Transaksi
