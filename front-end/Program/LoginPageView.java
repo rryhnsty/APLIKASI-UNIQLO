@@ -17,16 +17,16 @@ public class LoginPageView extends JFrame {
     private static final Color COLOR_INPUT_BG     = new Color(240, 240, 240);
     private static final Color COLOR_INPUT_BORDER = new Color(220, 220, 220);
 
-    // Warna tombol switcher
-    private static final Color COLOR_BTN_ACTIVE       = new Color(200, 30, 40);   // merah saat aktif
-    private static final Color COLOR_BTN_ACTIVE_HOVER = new Color(160, 20, 30);   // merah gelap saat hover
-    private static final Color COLOR_BTN_INACTIVE      = new Color(240, 240, 240); // abu saat tidak aktif
-    private static final Color COLOR_BTN_INACTIVE_HOVER= new Color(210, 210, 210); // abu gelap saat hover
+    
+    private static final Color COLOR_BTN_ACTIVE       = new Color(200, 30, 40);   
+    private static final Color COLOR_BTN_ACTIVE_HOVER = new Color(160, 20, 30);   
+    private static final Color COLOR_BTN_INACTIVE      = new Color(240, 240, 240); 
+    private static final Color COLOR_BTN_INACTIVE_HOVER= new Color(210, 210, 210); 
 
-    // State: apakah mode admin atau user?
+    
     private boolean isAdminMode = false;
 
-    // Referensi ke komponen yang dipakai saat login
+    
     private JTextField emailFieldRef;
     private JPasswordField passwordFieldRef;
     private JButton userBtn;
@@ -41,7 +41,7 @@ public class LoginPageView extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLayout(new BorderLayout());
 
-        // ── Left Panel ──────────────────────────────────────────────────────
+        
         JPanel leftPanel = new JPanel();
         leftPanel.setBackground(COLOR_LEFT_PANEL);
         leftPanel.setLayout(new GridBagLayout());
@@ -73,7 +73,7 @@ public class LoginPageView extends JFrame {
         descLabel.setColumns(25);
         leftPanel.add(descLabel, gbcLeft);
 
-        // ── Right Panel ─────────────────────────────────────────────────────
+        
         JPanel rightPanel = new JPanel();
         rightPanel.setBackground(COLOR_RIGHT_PANEL);
         rightPanel.setLayout(new GridBagLayout());
@@ -106,7 +106,7 @@ public class LoginPageView extends JFrame {
         detailsLabel.setForeground(COLOR_TEXT_GRAY);
         rightPanel.add(detailsLabel, gbcRight);
 
-        // ── Switcher User / Admin ────────────────────────────────────────────
+        
         gbcRight.gridy  = 3;
         gbcRight.insets = new Insets(40, 0, 0, 0);
 
@@ -114,19 +114,19 @@ public class LoginPageView extends JFrame {
         switcherPanel.setOpaque(false);
         switcherPanel.setPreferredSize(new Dimension(300, 40));
 
-        userBtn  = createSwitcherButton("User",  true);   // default aktif
+        userBtn  = createSwitcherButton("User",  true);   
         adminBtn = createSwitcherButton("Admin", false);
 
-        // Aksi klik: User
+        
         userBtn.addActionListener(e -> {
-            if (!isAdminMode) return; // sudah di mode user
+            if (!isAdminMode) return; 
             isAdminMode = false;
             updateSwitcher();
         });
 
-        // Aksi klik: Admin
+        
         adminBtn.addActionListener(e -> {
-            if (isAdminMode) return; // sudah di mode admin
+            if (isAdminMode) return; 
             isAdminMode = true;
             updateSwitcher();
         });
@@ -135,7 +135,7 @@ public class LoginPageView extends JFrame {
         switcherPanel.add(adminBtn);
         rightPanel.add(switcherPanel, gbcRight);
 
-        // ── Label mode login (berubah saat switch) ───────────────────────────
+        
         gbcRight.gridy  = 4;
         gbcRight.insets = new Insets(12, 0, 0, 0);
 
@@ -144,7 +144,7 @@ public class LoginPageView extends JFrame {
         loginModeLabel.setForeground(COLOR_RED_BRAND);
         rightPanel.add(loginModeLabel, gbcRight);
 
-        // ── Email Field ──────────────────────────────────────────────────────
+        
         gbcRight.gridy  = 5;
         gbcRight.insets = new Insets(20, 0, 0, 0);
         gbcRight.fill   = GridBagConstraints.HORIZONTAL;
@@ -153,14 +153,14 @@ public class LoginPageView extends JFrame {
         JPanel emailFieldPanel = createInputField("Email", "contoh@email.com");
         rightPanel.add(emailFieldPanel, gbcRight);
 
-        // ── Password Field ───────────────────────────────────────────────────
+        
         gbcRight.gridy  = 6;
         gbcRight.insets = new Insets(20, 0, 0, 0);
 
         JPanel passwordFieldPanel = createPasswordField("Password", "");
         rightPanel.add(passwordFieldPanel, gbcRight);
 
-        // ── Remember Me ──────────────────────────────────────────────────────
+        
         gbcRight.gridy  = 7;
         gbcRight.insets = new Insets(15, 0, 0, 0);
         gbcRight.fill   = GridBagConstraints.NONE;
@@ -171,7 +171,7 @@ public class LoginPageView extends JFrame {
         rememberMe.setOpaque(false);
         rightPanel.add(rememberMe, gbcRight);
 
-        // ── Sign In Button ───────────────────────────────────────────────────
+        
         gbcRight.gridy  = 8;
         gbcRight.insets = new Insets(40, 0, 0, 0);
         gbcRight.fill   = GridBagConstraints.HORIZONTAL;
@@ -189,12 +189,12 @@ public class LoginPageView extends JFrame {
             @Override public void mouseExited(MouseEvent e)  { signInBtn.setBackground(COLOR_RED_BRAND); }
         });
 
-        // Logika sign in
+        
         signInBtn.addActionListener(e -> handleSignIn());
 
         rightPanel.add(signInBtn, gbcRight);
 
-        // ── Sign Up Link ─────────────────────────────────────────────────────
+        
         gbcRight.gridy  = 9;
         gbcRight.insets = new Insets(30, 0, 0, 0);
         gbcRight.fill   = GridBagConstraints.NONE;
@@ -215,7 +215,7 @@ public class LoginPageView extends JFrame {
         });
         rightPanel.add(signUpLink, gbcRight);
 
-        // ── Split Pane ───────────────────────────────────────────────────────
+        
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
         splitPane.setDividerLocation(0.5);
         splitPane.setDividerSize(0);
@@ -225,9 +225,9 @@ public class LoginPageView extends JFrame {
         getConnection();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Helper: buat tombol switcher
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     private JButton createSwitcherButton(String text, boolean active) {
         JButton btn = new JButton(text);
         btn.setFocusPainted(false);
@@ -261,9 +261,9 @@ public class LoginPageView extends JFrame {
         return btn;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Update tampilan tombol switcher setelah diklik
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     private void updateSwitcher() {
         if (isAdminMode) {
             adminBtn.setBackground(COLOR_BTN_ACTIVE);
@@ -280,9 +280,9 @@ public class LoginPageView extends JFrame {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Logika Sign In
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     private void handleSignIn() {
         if (emailFieldRef == null || passwordFieldRef == null) {
             JOptionPane.showMessageDialog(this, "Form tidak ditemukan.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -292,7 +292,7 @@ public class LoginPageView extends JFrame {
         String email    = emailFieldRef.getText().trim();
         String password = new String(passwordFieldRef.getPassword());
 
-        // Validasi input kosong
+        
         if (email.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                 "Email dan password harus diisi.", "Peringatan", JOptionPane.WARNING_MESSAGE);
@@ -325,21 +325,21 @@ public class LoginPageView extends JFrame {
                 }
 
             } else {
-                // ── Cek tabel Customer ───────────────────────────────────────
-                // Langkah 1: cek apakah email terdaftar
+                
+                
                 String checkEmailSql = "SELECT * FROM Customer WHERE email = ?";
                 PreparedStatement psEmail = conn.prepareStatement(checkEmailSql);
                 psEmail.setString(1, email);
                 ResultSet rsEmail = psEmail.executeQuery();
 
                 if (!rsEmail.next()) {
-                    // Email tidak ditemukan
+                    
                     JOptionPane.showMessageDialog(this,
                         "Email tidak terdaftar.", "Login Gagal", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                // Langkah 2: cek password
+                
                 String dbPassword = rsEmail.getString("password");
                 if (!dbPassword.equals(password)) {
                     JOptionPane.showMessageDialog(this,
@@ -347,12 +347,12 @@ public class LoginPageView extends JFrame {
                     return;
                 }
 
-                // Login berhasil
+                
                 String customerId = rsEmail.getString("id_customer");
                 JOptionPane.showMessageDialog(this,
                     "Login berhasil!\nSelamat datang, " + email + "\nID: " + customerId,
                     "Sukses", JOptionPane.INFORMATION_MESSAGE);
-                // TODO: buka halaman utama customer
+                
                 HomePageView home = new HomePageView(customerId);
                 home.setVisible(true);
                 dispose();
@@ -364,9 +364,9 @@ public class LoginPageView extends JFrame {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Helper: buat input field biasa (menyimpan referensi ke emailFieldRef)
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     private JPanel createInputField(String labelText, String placeholder) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
@@ -386,7 +386,7 @@ public class LoginPageView extends JFrame {
         ));
         panel.add(textField, BorderLayout.CENTER);
 
-        // Simpan referensi untuk dipakai saat sign in
+        
         if (labelText.equals("Email")) {
             emailFieldRef = textField;
         }
@@ -394,9 +394,9 @@ public class LoginPageView extends JFrame {
         return panel;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Helper: buat password field (menyimpan referensi ke passwordFieldRef)
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     private JPanel createPasswordField(String labelText, String placeholder) {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setOpaque(false);
@@ -438,15 +438,15 @@ public class LoginPageView extends JFrame {
         ));
         panel.add(passwordField, gbc);
 
-        // Simpan referensi
+        
         passwordFieldRef = passwordField;
 
         return panel;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Koneksi database
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     private void getConnection() {
         try {
             String url = "jdbc:sqlserver://localhost:1433;databaseName=Uniqlo;encrypt=true;trustServerCertificate=true";
@@ -465,3 +465,4 @@ public class LoginPageView extends JFrame {
         });
     }
 }
+

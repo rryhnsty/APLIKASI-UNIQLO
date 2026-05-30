@@ -10,14 +10,9 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
-/**
- * AdminDashboardView.java
- * GUI Dashboard Admin yang modern untuk mengelola data penjualan, menampilkan informasi
- * admin yang aktif, total pendapatan, dan statistik barang terjual per item.
- */
-public class AdminDashboardView extends JFrame {
 
-    // ── Konstanta Warna Premium ────────────────────────────────────────────────
+public class AdminDashboardView extends JFrame {
+    
     private static final Color COLOR_RED_BRAND    = new Color(200, 30, 40);
     private static final Color COLOR_RED_HOVER    = new Color(160, 20, 30);
     private static final Color COLOR_BG_LIGHT     = new Color(245, 246, 248);
@@ -26,13 +21,13 @@ public class AdminDashboardView extends JFrame {
     private static final Color COLOR_BORDER       = new Color(222, 226, 230);
     private static final Color COLOR_CARD_BG      = Color.WHITE;
 
-    // ── Data Admin Aktif ───────────────────────────────────────────────────────
+    
     private String adminId = "-";
     private String adminNama = "-";
     private String adminEmail = "-";
     private String adminNoHp = "-";
 
-    // ── Komponen UI Statistik ──────────────────────────────────────────────────
+    
     private JLabel totalRevenueLabel;
     private JLabel totalSoldLabel;
     private JLabel adminNameLabel;
@@ -44,7 +39,7 @@ public class AdminDashboardView extends JFrame {
     public AdminDashboardView(String adminEmail) {
         this.adminEmail = adminEmail;
 
-        // Ambil data admin dari DB
+        
         loadAdminData();
 
         setTitle("Admin Dashboard - Style Connect");
@@ -52,15 +47,15 @@ public class AdminDashboardView extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Main Container
+        
         JPanel rootPanel = new JPanel(new BorderLayout(0, 0));
         rootPanel.setBackground(COLOR_BG_LIGHT);
         rootPanel.setBorder(new EmptyBorder(25, 25, 25, 25));
 
-        // 1. Header Panel
+        
         rootPanel.add(buildHeaderPanel(), BorderLayout.NORTH);
 
-        // 2. Center Workspace (Split Pane: Kiri = Info Admin, Kanan = Statistik & Tabel)
+        
         JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         mainSplit.setDividerLocation(320);
         mainSplit.setDividerSize(10);
@@ -74,13 +69,13 @@ public class AdminDashboardView extends JFrame {
         rootPanel.add(mainSplit, BorderLayout.CENTER);
         add(rootPanel);
 
-        // Load data statistik & tabel produk
+        
         refreshDashboardData();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  1. HEADER PANEL
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     private JPanel buildHeaderPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
@@ -100,7 +95,7 @@ public class AdminDashboardView extends JFrame {
         titleBlock.add(mainTitle);
         titleBlock.add(subTitle);
 
-        // Tombol Logout
+        
         JButton logoutBtn = new JButton("Sign Out");
         logoutBtn.setFont(new Font("Arial", Font.BOLD, 13));
         logoutBtn.setForeground(Color.WHITE);
@@ -125,9 +120,9 @@ public class AdminDashboardView extends JFrame {
         return panel;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  2. LEFT PANEL: DATA ADMIN & INFORMASI PRIBADI
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     private JPanel buildLeftPanel() {
         JPanel outerPanel = new JPanel(new BorderLayout());
         outerPanel.setOpaque(false);
@@ -141,21 +136,21 @@ public class AdminDashboardView extends JFrame {
             BorderFactory.createEmptyBorder(30, 20, 30, 20)
         ));
 
-        // Profil Avatar Bulat Sederhana
+        
         JLabel avatarLabel = new JLabel("👤");
         avatarLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 72));
         avatarLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         cardPanel.add(avatarLabel);
         cardPanel.add(Box.createVerticalStrut(15));
 
-        // Nama Admin
+        
         adminNameLabel = new JLabel(adminNama);
         adminNameLabel.setFont(new Font("Arial", Font.BOLD, 18));
         adminNameLabel.setForeground(COLOR_TEXT_DARK);
         adminNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         cardPanel.add(adminNameLabel);
 
-        // Badge Admin
+        
         JLabel badgeLabel = new JLabel("ADMINISTRATOR");
         badgeLabel.setFont(new Font("Arial", Font.BOLD, 10));
         badgeLabel.setForeground(COLOR_RED_BRAND);
@@ -167,7 +162,7 @@ public class AdminDashboardView extends JFrame {
         cardPanel.add(badgeLabel);
         cardPanel.add(Box.createVerticalStrut(30));
 
-        // Details Grid
+        
         JPanel detailsGrid = new JPanel(new GridLayout(6, 1, 5, 5));
         detailsGrid.setOpaque(false);
         detailsGrid.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -179,7 +174,7 @@ public class AdminDashboardView extends JFrame {
         cardPanel.add(detailsGrid);
         cardPanel.add(Box.createVerticalGlue());
 
-        // Tombol Refresh Data
+        
         JButton refreshBtn = new JButton("Refresh Dashboard");
         refreshBtn.setFont(new Font("Arial", Font.BOLD, 13));
         refreshBtn.setForeground(COLOR_RED_BRAND);
@@ -197,11 +192,11 @@ public class AdminDashboardView extends JFrame {
         });
         refreshBtn.addActionListener(e -> refreshDashboardData());
 
-        // Tombol Reset Data Penjualan
+        
         JButton resetBtn = new JButton("Reset Data Penjualan");
         resetBtn.setFont(new Font("Arial", Font.BOLD, 13));
         resetBtn.setForeground(Color.WHITE);
-        resetBtn.setBackground(new Color(220, 53, 69)); // Bootstrap Danger Red
+        resetBtn.setBackground(new Color(220, 53, 69)); 
         resetBtn.setFocusPainted(false);
         resetBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         resetBtn.setBorder(BorderFactory.createCompoundBorder(
@@ -215,7 +210,7 @@ public class AdminDashboardView extends JFrame {
         });
         resetBtn.addActionListener(e -> handleResetData());
 
-        // Container Button Panel
+        
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         buttonPanel.setOpaque(false);
@@ -231,25 +226,25 @@ public class AdminDashboardView extends JFrame {
         return outerPanel;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  3. RIGHT PANEL: SUMMARY CARDS & PRODUCT TABLES
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     private JPanel buildRightPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
 
-        // ── A. STATISTIK SUMMARY CARDS ──
+        
         JPanel statsPanel = new JPanel(new GridLayout(1, 2, 20, 0));
         statsPanel.setOpaque(false);
         statsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
 
-        // Card 1: Total Pendapatan
+        
         JPanel revCard = createStatCard("TOTAL PENDAPATAN (OMSET)", "Rp 0", "", new Color(40, 167, 69));
         totalRevenueLabel = (JLabel) revCard.getClientProperty("valueLabel");
         statsPanel.add(revCard);
 
-        // Card 2: Total Barang Terjual
+        
         JPanel soldCard = createStatCard("TOTAL ITEM TERJUAL", "0 Pcs", "", COLOR_RED_BRAND);
         totalSoldLabel = (JLabel) soldCard.getClientProperty("valueLabel");
         statsPanel.add(soldCard);
@@ -257,7 +252,7 @@ public class AdminDashboardView extends JFrame {
         panel.add(statsPanel);
         panel.add(Box.createVerticalStrut(25));
 
-        // ── B. TABEL PENJUALAN PER ITEM ──
+        
         JPanel tableContainer = new JPanel(new BorderLayout());
         tableContainer.setBackground(COLOR_CARD_BG);
         tableContainer.setBorder(BorderFactory.createCompoundBorder(
@@ -284,21 +279,21 @@ public class AdminDashboardView extends JFrame {
         productTable.setSelectionBackground(new Color(250, 242, 242));
         productTable.setSelectionForeground(COLOR_RED_BRAND);
 
-        // Lebar kolom
+        
         productTable.getColumnModel().getColumn(0).setPreferredWidth(80);
         productTable.getColumnModel().getColumn(1).setPreferredWidth(320);
         productTable.getColumnModel().getColumn(2).setPreferredWidth(140);
         productTable.getColumnModel().getColumn(3).setPreferredWidth(100);
         productTable.getColumnModel().getColumn(4).setPreferredWidth(120);
 
-        // Header styling
+        
         JTableHeader tableHeader = productTable.getTableHeader();
         tableHeader.setFont(new Font("Arial", Font.BOLD, 13));
         tableHeader.setBackground(COLOR_RED_BRAND);
         tableHeader.setForeground(Color.WHITE);
         tableHeader.setPreferredSize(new Dimension(100, 35));
 
-        // Center Align Kolom Tertentu
+        
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         productTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
@@ -306,7 +301,7 @@ public class AdminDashboardView extends JFrame {
         productTable.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
         productTable.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
 
-        // Alternate row colors
+        
         productTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(
@@ -336,9 +331,9 @@ public class AdminDashboardView extends JFrame {
         return panel;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  DB DATA OPERATIONS
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     private void loadAdminData() {
         Connection conn = DatabaseHelper.getConnection();
         if (conn == null) return;
@@ -374,7 +369,7 @@ public class AdminDashboardView extends JFrame {
         try {
             stmt = conn.createStatement();
 
-            // 1. Ambil Total Omset Pendapatan
+            
             double totalRevenue = 0;
             rsRevenue = stmt.executeQuery("SELECT SUM(total_belanja) AS total FROM Transaksi");
             if (rsRevenue.next()) {
@@ -382,7 +377,7 @@ public class AdminDashboardView extends JFrame {
             }
             totalRevenueLabel.setText(formatRupiah((long) totalRevenue));
 
-            // 2. Ambil Total Item Terjual
+            
             int totalSold = 0;
             rsSold = stmt.executeQuery("SELECT SUM(terjual) AS total FROM Product");
             if (rsSold.next()) {
@@ -390,7 +385,7 @@ public class AdminDashboardView extends JFrame {
             }
             totalSoldLabel.setText(totalSold + " Pcs");
 
-            // 3. Muat Data Tabel Produk terurut paling banyak terjual
+            
             tableModel.setRowCount(0);
             rsProducts = stmt.executeQuery(
                 "SELECT id_product, nama_produk, harga, stok, COALESCE(terjual, 0) AS jml_terjual " +
@@ -435,19 +430,19 @@ public class AdminDashboardView extends JFrame {
                 conn.setAutoCommit(false);
                 stmt = conn.createStatement();
 
-                // 1. Kosongkan TransaksiDetail
+                
                 stmt.executeUpdate("DELETE FROM TransaksiDetail");
 
-                // 2. Kosongkan Shipment
+                
                 stmt.executeUpdate("DELETE FROM Shipment");
 
-                // 3. Kosongkan Transaksi
+                
                 stmt.executeUpdate("DELETE FROM Transaksi");
 
-                // 4. Reset kolom terjual di Product ke 0
+                
                 stmt.executeUpdate("UPDATE Product SET terjual = 0");
 
-                // 5. Reset saldo Admin ke 0
+                
                 stmt.executeUpdate("UPDATE Admin SET saldo = 0");
 
                 conn.commit();
@@ -459,7 +454,7 @@ public class AdminDashboardView extends JFrame {
                     JOptionPane.INFORMATION_MESSAGE
                 );
 
-                // Refresh tampilan dashboard
+                
                 refreshDashboardData();
 
             } catch (SQLException e) {
@@ -479,9 +474,9 @@ public class AdminDashboardView extends JFrame {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  UI CREATION HELPERS
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     private JPanel createStatCard(String title, String initialVal, String iconSymbol, Color themeColor) {
         JPanel card = new JPanel(new BorderLayout(15, 0));
         card.setBackground(COLOR_CARD_BG);
@@ -490,7 +485,7 @@ public class AdminDashboardView extends JFrame {
             BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
-        // Panel Text
+        
         JPanel textBlock = new JPanel(new GridLayout(2, 1, 2, 2));
         textBlock.setOpaque(false);
 
@@ -505,7 +500,7 @@ public class AdminDashboardView extends JFrame {
         textBlock.add(titleLbl);
         textBlock.add(valLbl);
 
-        // Panel Icon
+        
         JLabel iconLbl = new JLabel(iconSymbol);
         iconLbl.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 42));
         iconLbl.setForeground(themeColor.brighter());
@@ -513,7 +508,7 @@ public class AdminDashboardView extends JFrame {
         card.add(textBlock, BorderLayout.CENTER);
         card.add(iconLbl, BorderLayout.EAST);
 
-        // Simpan referensi ke valueLabel agar bisa di-update
+        
         card.putClientProperty("valueLabel", valLbl);
 
         return card;
@@ -549,3 +544,4 @@ public class AdminDashboardView extends JFrame {
         if (r != null) try { r.close(); } catch (Exception ignored) {}
     }
 }
+

@@ -18,7 +18,7 @@ public class ProductCard extends JPanel {
                 BorderFactory.createEmptyBorder(10,10,10,10)
         ));
 
-        // ================= IMAGE SECTION =================
+        
 
         JPanel imagePanel = new JPanel(new BorderLayout());
 
@@ -75,7 +75,7 @@ public class ProductCard extends JPanel {
 
         add(imagePanel, BorderLayout.NORTH);
 
-        // ================= INFO SECTION =================
+        
 
         JPanel infoPanel = new JPanel();
 
@@ -123,7 +123,7 @@ public class ProductCard extends JPanel {
                 new Dimension(Integer.MAX_VALUE,40)
         );
 
-        // ================= ADD TO CART =================
+        
 
         cartBtn.addActionListener(e -> {
             boolean success = CartDataAccess.addToCart(customerId, product.getCategory());
@@ -137,7 +137,7 @@ public class ProductCard extends JPanel {
             }
         });
 
-        // tambah component
+        
         infoPanel.add(category);
 
         infoPanel.add(Box.createVerticalStrut(5));

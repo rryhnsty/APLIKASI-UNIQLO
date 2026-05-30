@@ -32,7 +32,7 @@ public class ProfileView extends JFrame {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
-        // ================= HEADER =================
+        
 
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(Color.WHITE);
@@ -117,7 +117,7 @@ public class ProfileView extends JFrame {
         gbc.gridy = 0;
         formPanel.add(new JLabel("NAMA"), gbc);
 
-        // NOMOR TELEPON
+        
         gbc.gridx = 1;
         formPanel.add(new JLabel("NOMOR TELEPON"), gbc);
 
@@ -134,20 +134,20 @@ public class ProfileView extends JFrame {
         teleponField.setPreferredSize(new Dimension(250,35));
         formPanel.add(teleponField, gbc);
 
-        // ===== ROW 3 =====
+        
 
-        // EMAIL
+        
         gbc.gridx = 0;
         gbc.gridy = 2;
         formPanel.add(new JLabel("EMAIL"), gbc);
 
-        // ALAMAT
+        
         gbc.gridx = 1;
         formPanel.add(new JLabel("ALAMAT"), gbc);
 
-        // ===== ROW 4 =====
+        
 
-        // emailLabel
+        
         gbc.gridx = 0;
         gbc.gridy = 3;
 
@@ -156,7 +156,7 @@ public class ProfileView extends JFrame {
         emailLabel.setPreferredSize(new Dimension(250,35));
         formPanel.add(emailLabel, gbc);
 
-        // alamatArea
+        
         gbc.gridx = 1;
 
         alamatArea = new JTextArea(5,20);
@@ -172,7 +172,7 @@ public class ProfileView extends JFrame {
 
         content.add(Box.createVerticalStrut(30));
 
-        // ================= BUTTON =================
+        
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBackground(Color.WHITE);
@@ -195,7 +195,7 @@ public class ProfileView extends JFrame {
         loadProfile();
     }
 
-    // ================= LOAD PROFILE =================
+    
 
     private void loadProfile() {
 
@@ -218,7 +218,7 @@ public class ProfileView extends JFrame {
                 String alamat = rs.getString("alamat");
                 String telepon = rs.getString("no_telepon");
 
-                // kalau null jangan tampil "null"
+                
                 if(nama == null) nama = "";
                 if(alamat == null) alamat = "";
                 if(telepon == null) telepon = "";
@@ -263,7 +263,7 @@ public class ProfileView extends JFrame {
         }
     }
 
-    // ================= SAVE PROFILE =================
+    
 
     private void saveProfile() {
 
@@ -297,7 +297,7 @@ public class ProfileView extends JFrame {
         }
     }
 
-    // ================= CONNECTION =================
+    
 
     private void getConnection() {
 
@@ -320,3 +320,4 @@ public class ProfileView extends JFrame {
         }
     }
 }
+

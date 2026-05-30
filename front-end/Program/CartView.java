@@ -58,7 +58,7 @@ public class CartView extends JFrame {
 
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // ================= FOOTER =================
+        
 
         JPanel footerPanel = new JPanel(new BorderLayout());
         footerPanel.setBackground(Color.WHITE);
@@ -99,7 +99,7 @@ public class CartView extends JFrame {
         loadCartData();
     }
 
-    // ================= LOAD CART =================
+    
 
     private void loadCartData() {
 
@@ -164,7 +164,7 @@ public class CartView extends JFrame {
         cartContainer.repaint();
     }
 
-    // ================= CART ITEM =================
+    
 
     private JPanel createCartItem(
             int cartItemId,
@@ -181,7 +181,7 @@ public class CartView extends JFrame {
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE,180));
         panel.setBorder(new EmptyBorder(15,15,15,15));
 
-        // ================= IMAGE =================
+        
 
         ImageIcon icon = new ImageIcon(imagePath);
 
@@ -195,7 +195,7 @@ public class CartView extends JFrame {
 
         panel.add(imageLabel, BorderLayout.WEST);
 
-        // ================= INFO =================
+        
 
         JPanel infoPanel = new JPanel();
         infoPanel.setBackground(Color.WHITE);
@@ -227,7 +227,7 @@ public class CartView extends JFrame {
 
         panel.add(infoPanel, BorderLayout.CENTER);
 
-        // ================= BUTTON =================
+        
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(Color.WHITE);
@@ -251,7 +251,7 @@ public class CartView extends JFrame {
         return panel;
     }
 
-    // ================= REMOVE ITEM =================
+    
 
     private void removeCartItem(int cartItemId) {
         boolean success = CartDataAccess.removeCartItem(cartItemId);
@@ -271,7 +271,7 @@ public class CartView extends JFrame {
         }
     }   
 
-    // ================= PRICE HELPER =================
+    
 
     private int convertPriceToNumber(String price) {
 

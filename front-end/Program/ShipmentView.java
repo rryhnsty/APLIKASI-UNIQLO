@@ -12,7 +12,6 @@ import javax.swing.table.JTableHeader;
 
 
 public class ShipmentView extends JFrame {
-
     
     private static final Color COLOR_RED_BRAND    = new Color(200, 30, 40);
     private static final Color COLOR_RED_HOVER    = new Color(160, 20, 30);

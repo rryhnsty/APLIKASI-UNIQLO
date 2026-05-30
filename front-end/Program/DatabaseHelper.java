@@ -6,42 +6,39 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
 
-/**
- * DatabaseHelper.java
- * Class Utility terpusat untuk mengelola koneksi database MySQL / SQL Server.
- */
+
 public class DatabaseHelper {
 
-    // ================= CONFIGURATION =================
-    // Silakan sesuaikan driver, url, username, dan password database Anda di sini.
     
-    // Konfigurasi MySQL (Rekomendasi untuk kebutuhan baru)
+    
+    
+    
     private static final String MYSQL_DRIVER = "com.mysql.cj.jdbc.Driver";
     private static final String MYSQL_URL    = "jdbc:sqlserver://localhost:1433;databaseName=Uniqlo;encrypt=true;trustServerCertificate=true";
     private static final String MYSQL_USER   = "sa";
-    private static final String MYSQL_PASS   = "revanna16"; // Menggunakan password database lokal Anda
+    private static final String MYSQL_PASS   = "revanna16"; 
 
-    // Konfigurasi SQL Server (Koneksi bawaan project)
+    
     private static final String SQLSERVER_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     private static final String SQLSERVER_URL    = "jdbc:sqlserver://localhost:1433;databaseName=Uniqlo;encrypt=true;trustServerCertificate=true";
     private static final String SQLSERVER_USER   = "sa";
     private static final String SQLSERVER_PASS   = "revanna16";
 
-    // Set true untuk menggunakan MySQL, false untuk SQL Server
+    
     private static final boolean USE_MYSQL = false; 
 
     private static boolean schemaInitialized = false;
 
-    // ================= GET CONNECTION =================
+    
     public static Connection getConnection() {
         Connection conn = null;
         try {
             if (USE_MYSQL) {
-                // Load Driver MySQL
+                
                 Class.forName(MYSQL_DRIVER);
                 conn = DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASS);
             } else {
-                // Load Driver SQL Server
+                
                 Class.forName(SQLSERVER_DRIVER);
                 conn = DriverManager.getConnection(SQLSERVER_URL, SQLSERVER_USER, SQLSERVER_PASS);
             }
@@ -69,7 +66,7 @@ public class DatabaseHelper {
         try {
             stmt = conn.createStatement();
             
-            // 1. Cek & tambah kolom terjual di Product
+            
             stmt.execute(
                 "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Product') AND name = 'terjual') " +
                 "BEGIN " +
@@ -77,7 +74,7 @@ public class DatabaseHelper {
                 "END"
             );
 
-            // 2. Cek & tambah kolom status_pengiriman di Transaksi
+            
             stmt.execute(
                 "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Transaksi') AND name = 'status_pengiriman') " +
                 "BEGIN " +
@@ -85,7 +82,7 @@ public class DatabaseHelper {
                 "END"
             );
 
-            // 3. Cek & buat ulang tabel Shipment jika masih menggunakan skema lama (id_order)
+            
             stmt.execute(
                 "IF EXISTS (SELECT * FROM sys.tables WHERE name = 'Shipment') " +
                 "BEGIN " +
@@ -96,7 +93,7 @@ public class DatabaseHelper {
                 "END"
             );
 
-            // 4. Buat tabel Shipment baru jika belum ada
+            
             stmt.execute(
                 "IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Shipment') " +
                 "BEGIN " +
@@ -122,3 +119,4 @@ public class DatabaseHelper {
         }
     }
 }
+
