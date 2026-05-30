@@ -307,8 +307,6 @@ public class LoginPageView extends JFrame {
 
         try {
             if (isAdminMode) {
-                // ── Cek tabel Admin ──────────────────────────────────────────
-                // Sesuaikan nama tabel dan kolom dengan skema database kamu
                 String sql = "SELECT * FROM Admin WHERE email = ? AND password = ?";
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ps.setString(1, email);
