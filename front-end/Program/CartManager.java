@@ -16,7 +16,7 @@ public class CartManager {
 
     
     private final List<CartItem> items = new ArrayList<>();
-    private String customerId = "C001";   // default fallback
+    private String customerId = "C001";
 
     private CartManager() {}
     public void setCustomerId(String id) { this.customerId = id; }
