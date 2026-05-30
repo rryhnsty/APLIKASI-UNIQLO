@@ -39,6 +39,7 @@ public class ShipmentView extends JFrame {
     private final double grandTotal;
     private final double uangDibayar;
     private final double kembalian;
+    private final int    idTransaction;
 
     // ── Komponen UI ───────────────────────────────────────────────────────────
     private JLabel           statusBadge;
@@ -50,19 +51,37 @@ public class ShipmentView extends JFrame {
     // ── Timer ─────────────────────────────────────────────────────────────────
     private Timer countdownTimer;
     private int   secondsLeft = 15;
+    private boolean statusUpdatedToDelivery = false;
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  Constructor
+    //  Constructors
     // ─────────────────────────────────────────────────────────────────────────
     public ShipmentView(String customerId, double grandTotal,
                         double uangDibayar, double kembalian) {
+        this(customerId, grandTotal, uangDibayar, kembalian, CartDataAccess.getLastTransactionId(customerId));
+    }
+
+    public ShipmentView(String customerId, double grandTotal,
+                        double uangDibayar, double kembalian, int idTransaction) {
         this.customerId  = customerId;
         this.grandTotal  = grandTotal;
         this.uangDibayar = uangDibayar;
         this.kembalian   = kembalian;
+        this.idTransaction = idTransaction;
+
+        // Check initial status from DB
+        Object[] shipmentInfo = CartDataAccess.getShipmentInfo(idTransaction);
+        if (shipmentInfo != null && "pesanan tiba di tujuan".equalsIgnoreCase((String) shipmentInfo[3])) {
+            secondsLeft = 0;
+        } else if (shipmentInfo != null && "sedang dalam pengantaran".equalsIgnoreCase((String) shipmentInfo[3])) {
+            secondsLeft = 14;
+            statusUpdatedToDelivery = true;
+        } else {
+            secondsLeft = 15;
+        }
 
         setTitle("Status Pengiriman - JEKI Store");
-        setSize(1050, 720);
+        setSize(1050, 750);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -222,18 +241,35 @@ public class ShipmentView extends JFrame {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  PANEL KANAN – Status Pengiriman + Ringkasan Transaksi
-    //  (Alur logika tidak berubah; tombol Lacak Pesanan dihapus)
+    //  PANEL KANAN – Status Pengiriman + Ringkasan Transaksi & Shipment
     // ─────────────────────────────────────────────────────────────────────────
     private JPanel buildRightPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(COLOR_BG_LIGHT);
-        panel.setPreferredSize(new Dimension(400, 500));
+        panel.setPreferredSize(new Dimension(300, 400));
         panel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(230, 230, 230)),
-                BorderFactory.createEmptyBorder(25, 25, 25, 25)
+                BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
+
+        // Load shipment info dari DB
+        Object[] shipmentInfo = CartDataAccess.getShipmentInfo(idTransaction);
+        String idShipment = "-";
+        String alamat = "-";
+        String courier = "-";
+        String resi = "-";
+        double ongkir = 0;
+        String statusKirim = "sedang dikirim";
+
+        if (shipmentInfo != null) {
+            idShipment = (String) shipmentInfo[0];
+            alamat = (String) shipmentInfo[1];
+            statusKirim = (String) shipmentInfo[3];
+            courier = (String) shipmentInfo[4];
+            resi = (String) shipmentInfo[5];
+            ongkir = (Double) shipmentInfo[6];
+        }
 
         // ── A. Judul ──────────────────────────────────────────────────────────
         JLabel sectionTitle = new JLabel("Info Pengiriman");
@@ -241,37 +277,66 @@ public class ShipmentView extends JFrame {
         sectionTitle.setForeground(COLOR_RED_BRAND);
         sectionTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(sectionTitle);
-        panel.add(Box.createVerticalStrut(18));
+        panel.add(Box.createVerticalStrut(15));
 
         // ── B. Badge Status ───────────────────────────────────────────────────
-        statusBadge = new JLabel("● SEDANG DIKIRIM");
+        statusBadge = new JLabel();
         statusBadge.setFont(new Font("Arial", Font.BOLD, 13));
         statusBadge.setOpaque(true);
-        statusBadge.setBackground(COLOR_YELLOW_BG);
-        statusBadge.setForeground(COLOR_YELLOW_ON);
+        if ("pesanan tiba di tujuan".equalsIgnoreCase(statusKirim)) {
+            statusBadge.setText("PESANAN TIBA DI TUJUAN");
+            statusBadge.setBackground(COLOR_GREEN_BG);
+            statusBadge.setForeground(COLOR_GREEN_ON);
+        } else if ("sedang dalam pengantaran".equalsIgnoreCase(statusKirim)) {
+            statusBadge.setText("SEDANG DALAM PENGANTARAN");
+            statusBadge.setBackground(COLOR_YELLOW_BG);
+            statusBadge.setForeground(COLOR_YELLOW_ON);
+        } else {
+            statusBadge.setText("SEDANG DIKIRIM");
+            statusBadge.setBackground(COLOR_YELLOW_BG);
+            statusBadge.setForeground(COLOR_YELLOW_ON);
+        }
         statusBadge.setBorder(new EmptyBorder(6, 14, 6, 14));
         statusBadge.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(statusBadge);
-        panel.add(Box.createVerticalStrut(20));
+        panel.add(Box.createVerticalStrut(15));
 
         // ── C. Ikon + Teks Status Utama ───────────────────────────────────────
         JPanel iconRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
         iconRow.setOpaque(false);
         iconRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        statusIconLabel = new JLabel("🚚");
+        statusIconLabel = new JLabel();
         statusIconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 36));
 
         JPanel statusTextBlock = new JPanel();
         statusTextBlock.setLayout(new BoxLayout(statusTextBlock, BoxLayout.Y_AXIS));
         statusTextBlock.setOpaque(false);
 
-        statusTextLabel = new JLabel("Pesanan Sedang Dalam Perjalanan");
+        statusTextLabel = new JLabel();
         statusTextLabel.setFont(new Font("Arial", Font.BOLD, 15));
 
-        etaLabel = new JLabel("Estimasi tiba: " + secondsLeft + " detik lagi...");
+        etaLabel = new JLabel();
         etaLabel.setFont(new Font("Arial", Font.PLAIN, 13));
         etaLabel.setForeground(COLOR_TEXT_GRAY);
+
+        if ("pesanan tiba di tujuan".equalsIgnoreCase(statusKirim)) {
+            statusIconLabel.setText("📦");
+            statusTextLabel.setText("Pesanan Tiba");
+            statusTextLabel.setForeground(COLOR_GREEN_ON);
+            etaLabel.setText("Terima kasih telah berbelanja di JEKI Store");
+            etaLabel.setForeground(COLOR_GREEN_ON);
+        } else if ("sedang dalam pengantaran".equalsIgnoreCase(statusKirim)) {
+            statusIconLabel.setText("🛵");
+            statusTextLabel.setText("Sedang Dalam Pengantaran");
+            statusTextLabel.setForeground(COLOR_YELLOW_ON);
+            etaLabel.setText("Estimasi tiba: " + secondsLeft + " detik lagi...");
+        } else {
+            statusIconLabel.setText("🚚");
+            statusTextLabel.setText("Sedang Dikirim");
+            statusTextLabel.setForeground(COLOR_RED_BRAND);
+            etaLabel.setText("Estimasi tiba: " + secondsLeft + " detik lagi...");
+        }
 
         statusTextBlock.add(statusTextLabel);
         statusTextBlock.add(Box.createVerticalStrut(4));
@@ -280,23 +345,48 @@ public class ShipmentView extends JFrame {
         iconRow.add(statusIconLabel);
         iconRow.add(statusTextBlock);
         panel.add(iconRow);
-        panel.add(Box.createVerticalStrut(25));
+        panel.add(Box.createVerticalStrut(15));
 
         // ── D. Garis Pemisah ──────────────────────────────────────────────────
         JSeparator sep1 = new JSeparator();
         sep1.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(sep1);
-        panel.add(Box.createVerticalStrut(20));
+        panel.add(Box.createVerticalStrut(15));
 
-        // ── E. Ringkasan Pembayaran ───────────────────────────────────────────
+        // ── E. Detail Shipment dari Database ──────────────────────────────────
+        JLabel shipmentTitle = new JLabel("DETAIL PENGIRIMAN");
+        shipmentTitle.setFont(new Font("Arial", Font.BOLD, 12));
+        shipmentTitle.setForeground(COLOR_TEXT_GRAY);
+        shipmentTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(shipmentTitle);
+        panel.add(Box.createVerticalStrut(10));
+
+        JPanel shipGrid = new JPanel(new GridLayout(5, 2, 5, 8));
+        shipGrid.setOpaque(false);
+        shipGrid.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        addGridRow(shipGrid, "No Shipment :", idShipment);
+        addGridRow(shipGrid, "Jasa Kirim :",  courier);
+        addGridRow(shipGrid, "No Resi :",     resi);
+        addGridRow(shipGrid, "Ongkir :",      formatRupiah((long) ongkir));
+        addGridRowHtml(shipGrid, "Alamat Kirim :", alamat);
+        panel.add(shipGrid);
+
+        panel.add(Box.createVerticalStrut(15));
+        JSeparator sep2 = new JSeparator();
+        sep2.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(sep2);
+        panel.add(Box.createVerticalStrut(15));
+
+        // ── F. Ringkasan Pembayaran ───────────────────────────────────────────
         JLabel ringkasanTitle = new JLabel("RINGKASAN PEMBAYARAN");
         ringkasanTitle.setFont(new Font("Arial", Font.BOLD, 12));
         ringkasanTitle.setForeground(COLOR_TEXT_GRAY);
         ringkasanTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(ringkasanTitle);
-        panel.add(Box.createVerticalStrut(12));
+        panel.add(Box.createVerticalStrut(10));
 
-        JPanel grid = new JPanel(new GridLayout(4, 2, 10, 12));
+        JPanel grid = new JPanel(new GridLayout(4, 2, 5, 8));
         grid.setOpaque(false);
         grid.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -306,28 +396,25 @@ public class ShipmentView extends JFrame {
         addGridRow(grid, "Kembalian :",      formatRupiah((long) kembalian));
 
         panel.add(grid);
-        panel.add(Box.createVerticalStrut(20));
+        panel.add(Box.createVerticalStrut(15));
 
-        JSeparator sep2 = new JSeparator();
-        sep2.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.add(sep2);
-        panel.add(Box.createVerticalStrut(20));
+        JSeparator sep3 = new JSeparator();
+        sep3.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(sep3);
+        panel.add(Box.createVerticalStrut(15));
 
-        // ── F. Total Besar ────────────────────────────────────────────────────
+        // ── G. Total Besar ────────────────────────────────────────────────────
         JLabel totalSmall = new JLabel("TOTAL DIBAYARKAN");
         totalSmall.setFont(new Font("Arial", Font.BOLD, 12));
         totalSmall.setForeground(COLOR_TEXT_GRAY);
         totalSmall.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(totalSmall);
 
-        JLabel totalBig = new JLabel(formatRupiah((long) grandTotal));
-        totalBig.setFont(new Font("Arial", Font.BOLD, 32));
+        JLabel totalBig = new JLabel(formatRupiah((long) (grandTotal + ongkir)));
+        totalBig.setFont(new Font("Arial", Font.BOLD, 30));
         totalBig.setForeground(COLOR_RED_BRAND);
         totalBig.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(totalBig);
-
-        // ── Tombol Lacak Pesanan DIHAPUS sesuai permintaan ───────────────────
-        // (tidak ada panel.add(trackBtn) di sini)
 
         panel.add(Box.createVerticalGlue());
 
@@ -336,10 +423,6 @@ public class ShipmentView extends JFrame {
 
     // ─────────────────────────────────────────────────────────────────────────
     //  LOAD DATA BARANG – dari TransaksiDetail (via CartDataAccess)
-    //
-    //  Setelah processPaymentTransaction() dijalankan, snapshot CartItem
-    //  sudah tersimpan di tabel TransaksiDetail. Method ini membacanya
-    //  dan menampilkan setiap produk sebagai baris terpisah di tabel.
     // ─────────────────────────────────────────────────────────────────────────
     private void loadOrderItems() {
         tableModel.setRowCount(0);
@@ -348,8 +431,7 @@ public class ShipmentView extends JFrame {
         List<Object[]> rows = CartDataAccess.getLastTransaksiDetail(customerId);
 
         if (rows.isEmpty()) {
-            // Fallback: jika TransaksiDetail masih kosong (misal DB belum di-update),
-            // tampilkan satu baris ringkasan dari parameter constructor.
+            // Fallback
             tableModel.addRow(new Object[]{
                 "-",
                 "Pesanan Customer " + customerId,
@@ -358,7 +440,6 @@ public class ShipmentView extends JFrame {
                 formatRupiah((long) grandTotal)
             });
         } else {
-            // Tampilkan setiap produk sebagai baris terpisah
             for (Object[] row : rows) {
                 tableModel.addRow(row);
             }
@@ -369,10 +450,26 @@ public class ShipmentView extends JFrame {
     //  COUNTDOWN TIMER – 15 detik → update status
     // ─────────────────────────────────────────────────────────────────────────
     private void startCountdown() {
+        if (secondsLeft <= 0) {
+            updateStatusArrivedUI();
+            return;
+        }
+
+        // Jika sisa waktu kurang dari 15 detik (misalnya saat reload), perbarui UI ke pengantaran
+        if (secondsLeft < 15) {
+            updateStatusDeliveryUI();
+        }
+
         countdownTimer = new Timer(1000, e -> {
             secondsLeft--;
             if (secondsLeft > 0) {
                 etaLabel.setText("Estimasi tiba: " + secondsLeft + " detik lagi...");
+                
+                // Jika hitung mundur mulai (< 15 detik) dan status belum diperbarui, set ke sedang dalam pengantaran
+                if (secondsLeft < 15 && !statusUpdatedToDelivery) {
+                    statusUpdatedToDelivery = true;
+                    updateStatusDelivery();
+                }
             } else {
                 stopCountdown();
                 updateStatusArrived();
@@ -381,28 +478,67 @@ public class ShipmentView extends JFrame {
         countdownTimer.start();
     }
 
+    private void updateStatusDelivery() {
+        // Update status di database (Shipment & Transaksi)
+        CartDataAccess.updateShipmentAndTransactionStatus(idTransaction, "sedang dalam pengantaran");
+
+        // Update UI
+        updateStatusDeliveryUI();
+    }
+
+    private void updateStatusDeliveryUI() {
+        // Badge
+        statusBadge.setText("SEDANG DALAM PENGANTARAN");
+        statusBadge.setBackground(COLOR_YELLOW_BG);
+        statusBadge.setForeground(COLOR_YELLOW_ON);
+
+        // Ikon & teks
+        statusIconLabel.setText("🛵");
+        statusTextLabel.setText("Sedang Dalam Pengantaran");
+        statusTextLabel.setForeground(COLOR_YELLOW_ON);
+
+        etaLabel.setForeground(COLOR_TEXT_GRAY);
+
+        // Repaint
+        statusBadge.revalidate();    statusBadge.repaint();
+        statusIconLabel.revalidate(); statusIconLabel.repaint();
+        statusTextLabel.revalidate(); statusTextLabel.repaint();
+        etaLabel.revalidate();        etaLabel.repaint();
+    }
+
     private void stopCountdown() {
         if (countdownTimer != null && countdownTimer.isRunning()) {
             countdownTimer.stop();
         }
     }
 
-    /**
-     * Mengubah semua elemen UI status menjadi "Pesanan Tiba Di Tujuan".
-     * Dipanggil di Event Dispatch Thread (aman karena Timer Swing).
-     */
     private void updateStatusArrived() {
+        // Update status di database (Shipment & Transaksi)
+        CartDataAccess.updateShipmentAndTransactionStatus(idTransaction, "pesanan tiba di tujuan");
+
+        // Update UI
+        updateStatusArrivedUI();
+
+        // Notifikasi popup
+        JOptionPane.showMessageDialog(this,
+            "Pesanan Anda telah tiba di tujuan!\nTerima kasih telah berbelanja di JEKI Store.",
+            "Pesanan Tiba",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    private void updateStatusArrivedUI() {
         // Badge
-        statusBadge.setText("✓ PESANAN TIBA DI TUJUAN");
+        statusBadge.setText("PESANAN TIBA DI TUJUAN");
         statusBadge.setBackground(COLOR_GREEN_BG);
         statusBadge.setForeground(COLOR_GREEN_ON);
 
         // Ikon & teks
         statusIconLabel.setText("📦");
-        statusTextLabel.setText("Pesanan Telah Tiba di Tujuan!");
+        statusTextLabel.setText("Pesanan Tiba");
         statusTextLabel.setForeground(COLOR_GREEN_ON);
 
-        etaLabel.setText("Terima kasih telah berbelanja di JEKI Store ✨");
+        etaLabel.setText("Terima kasih telah berbelanja di JEKI Store");
         etaLabel.setForeground(COLOR_GREEN_ON);
 
         // Repaint
@@ -410,13 +546,6 @@ public class ShipmentView extends JFrame {
         statusIconLabel.revalidate(); statusIconLabel.repaint();
         statusTextLabel.revalidate(); statusTextLabel.repaint();
         etaLabel.revalidate();        etaLabel.repaint();
-
-        // Notifikasi popup
-        JOptionPane.showMessageDialog(this,
-            "🎉 Pesanan Anda telah tiba di tujuan!\nTerima kasih telah berbelanja di JEKI Store.",
-            "Pesanan Tiba",
-            JOptionPane.INFORMATION_MESSAGE
-        );
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -429,6 +558,19 @@ public class ShipmentView extends JFrame {
 
         JLabel val = new JLabel(valueText);
         val.setFont(new Font("Arial", Font.BOLD, 14));
+        val.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        grid.add(lbl);
+        grid.add(val);
+    }
+
+    private void addGridRowHtml(JPanel grid, String labelText, String valueText) {
+        JLabel lbl = new JLabel(labelText);
+        lbl.setFont(new Font("Arial", Font.PLAIN, 14));
+        lbl.setForeground(COLOR_TEXT_GRAY);
+
+        JLabel val = new JLabel("<html><div style='text-align: right; width: 180px;'>" + valueText + "</div></html>");
+        val.setFont(new Font("Arial", Font.BOLD, 13));
         val.setHorizontalAlignment(SwingConstants.RIGHT);
 
         grid.add(lbl);

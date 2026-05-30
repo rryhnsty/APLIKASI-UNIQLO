@@ -152,22 +152,29 @@ public class CartDataAccess {
      *  2. INSERT ke Transaksi → ambil id_transaction baru.
      *  3. Ambil snapshot Cart (JOIN Product).
      *  4. Batch INSERT snapshot ke TransaksiDetail.
-     *  5. DELETE Cart customer.
+     *  5. UPDATE stok dan tambah kolom terjual di Product.
+     *  6. INSERT data shipment ke tabel Shipment.
+     *  7. DELETE Cart customer.
      */
     public static boolean processPaymentTransaction(
             String idCustomer, double subtotal,
-            double uangDibayar, double kembalian) {
+            double uangDibayar, double kembalian,
+            String courier, double ongkir) {
 
         Connection conn = DatabaseHelper.getConnection();
         if (conn == null) return false;
 
-        PreparedStatement psUpdateAdmin  = null;
-        PreparedStatement psInsertTrans  = null;
-        PreparedStatement psGetCart      = null;
-        PreparedStatement psInsertDetail = null;
-        PreparedStatement psDeleteCart   = null;
-        ResultSet         rsInsert       = null;
-        ResultSet         rsCart         = null;
+        PreparedStatement psUpdateAdmin   = null;
+        PreparedStatement psInsertTrans   = null;
+        PreparedStatement psGetCart       = null;
+        PreparedStatement psInsertDetail  = null;
+        PreparedStatement psUpdateProduct = null;
+        PreparedStatement psGetCustomerAddress = null;
+        PreparedStatement psInsertShipment = null;
+        PreparedStatement psDeleteCart    = null;
+        ResultSet         rsInsert        = null;
+        ResultSet         rsCart          = null;
+        ResultSet         rsAddress       = null;
 
         try {
             conn.setAutoCommit(false);
@@ -190,14 +197,15 @@ public class CartDataAccess {
             // ── 2. INSERT ke Transaksi, ambil id_transaction baru ────────────
             psInsertTrans = conn.prepareStatement(
                 "INSERT INTO Transaksi " +
-                "(id_customer, total_belanja, uang_dibayar, kembalian, tanggal_transaksi) " +
-                "VALUES (?, ?, ?, ?, ?)",
+                "(id_customer, total_belanja, uang_dibayar, kembalian, tanggal_transaksi, status_pengiriman) " +
+                "VALUES (?, ?, ?, ?, ?, ?)",
                 Statement.RETURN_GENERATED_KEYS);
             psInsertTrans.setString(1, idCustomer);
             psInsertTrans.setDouble(2, subtotal);
             psInsertTrans.setDouble(3, uangDibayar);
             psInsertTrans.setDouble(4, kembalian);
             psInsertTrans.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+            psInsertTrans.setString(6, "sedang dikirim");
             psInsertTrans.executeUpdate();
 
             rsInsert = psInsertTrans.getGeneratedKeys();
@@ -215,26 +223,72 @@ public class CartDataAccess {
             psGetCart.setString(1, idCustomer);
             rsCart = psGetCart.executeQuery();
 
-            // ── 4. Batch INSERT ke TransaksiDetail ───────────────────────────
+            // ── 4. Batch INSERT ke TransaksiDetail & UPDATE Product ───────────
             if (idTransaction > 0) {
                 psInsertDetail = conn.prepareStatement(
                     "INSERT INTO TransaksiDetail " +
                     "(id_transaction, id_product, nama_produk, harga_satuan, quantity, subtotal) " +
                     "VALUES (?, ?, ?, ?, ?, ?)");
 
+                psUpdateProduct = conn.prepareStatement(
+                    "UPDATE Product SET stok = stok - ?, terjual = COALESCE(terjual, 0) + ? " +
+                    "WHERE id_product = ?");
+
                 while (rsCart.next()) {
+                    String idProd = rsCart.getString("id_product");
+                    int qty = rsCart.getInt("quantity");
+                    
+                    // Transaksi Detail
                     psInsertDetail.setInt(1, idTransaction);
-                    psInsertDetail.setString(2, rsCart.getString("id_product"));
+                    psInsertDetail.setString(2, idProd);
                     psInsertDetail.setString(3, rsCart.getString("nama_produk"));
                     psInsertDetail.setDouble(4, rsCart.getDouble("harga"));
-                    psInsertDetail.setInt(5, rsCart.getInt("quantity"));
+                    psInsertDetail.setInt(5, qty);
                     psInsertDetail.setDouble(6, rsCart.getDouble("total_harga"));
                     psInsertDetail.addBatch();
+
+                    // Update Product (stok & terjual)
+                    psUpdateProduct.setInt(1, qty);
+                    psUpdateProduct.setInt(2, qty);
+                    psUpdateProduct.setString(3, idProd);
+                    psUpdateProduct.addBatch();
                 }
                 psInsertDetail.executeBatch();
+                psUpdateProduct.executeBatch();
             }
 
-            // ── 5. Hapus seluruh Cart customer ───────────────────────────────
+            // ── 5. Ambil alamat customer ──────────────────────────────────────
+            String alamatCustomer = "Alamat tidak ditentukan";
+            psGetCustomerAddress = conn.prepareStatement("SELECT alamat FROM Customer WHERE id_customer = ?");
+            psGetCustomerAddress.setString(1, idCustomer);
+            rsAddress = psGetCustomerAddress.executeQuery();
+            if (rsAddress.next() && rsAddress.getString("alamat") != null) {
+                alamatCustomer = rsAddress.getString("alamat");
+            }
+
+            // ── 6. Buat data Shipment di tabel Shipment ───────────────────────
+            if (idTransaction > 0) {
+                String cleanCourier = courier.replace("&", "").trim();
+                String prefix = cleanCourier.length() >= 3 ? cleanCourier.substring(0, 3).toUpperCase() : "SHP";
+                String resi = prefix + (1000000000L + new java.util.Random().nextLong(9000000000L));
+                String idShipment = "SHP-" + String.format("%04d", idTransaction);
+
+                psInsertShipment = conn.prepareStatement(
+                    "INSERT INTO Shipment " +
+                    "(id_shipment, id_transaction, alamat, tanggal_kirim, status_kirim, nama_jasa_kirim, resi, ongkir) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                psInsertShipment.setString(1, idShipment);
+                psInsertShipment.setInt(2, idTransaction);
+                psInsertShipment.setString(3, alamatCustomer);
+                psInsertShipment.setDate(4, new java.sql.Date(System.currentTimeMillis()));
+                psInsertShipment.setString(5, "sedang dikirim");
+                psInsertShipment.setString(6, courier);
+                psInsertShipment.setString(7, resi);
+                psInsertShipment.setDouble(8, ongkir);
+                psInsertShipment.executeUpdate();
+            }
+
+            // ── 7. Hapus seluruh Cart customer ───────────────────────────────
             psDeleteCart = conn.prepareStatement(
                 "DELETE FROM Cart WHERE id_customer = ?");
             psDeleteCart.setString(1, idCustomer);
@@ -250,9 +304,11 @@ public class CartDataAccess {
             }
             return false;
         } finally {
-            closeQuietly(rsInsert);      closeQuietly(rsCart);
-            closeQuietly(psUpdateAdmin); closeQuietly(psInsertTrans);
-            closeQuietly(psGetCart);     closeQuietly(psInsertDetail);
+            closeQuietly(rsInsert);              closeQuietly(rsCart);
+            closeQuietly(rsAddress);             closeQuietly(psUpdateAdmin); 
+            closeQuietly(psInsertTrans);         closeQuietly(psGetCart);     
+            closeQuietly(psInsertDetail);        closeQuietly(psUpdateProduct);
+            closeQuietly(psGetCustomerAddress);  closeQuietly(psInsertShipment);
             closeQuietly(psDeleteCart);
             try { conn.setAutoCommit(true); } catch (SQLException ignored) {}
             closeQuietly(conn);
@@ -303,6 +359,98 @@ public class CartDataAccess {
             closeQuietly(rs); closeQuietly(ps); closeQuietly(conn);
         }
         return rows;
+    }
+
+    // ================= GET LAST TRANSACTION ID =================
+    public static int getLastTransactionId(String idCustomer) {
+        Connection conn = DatabaseHelper.getConnection();
+        if (conn == null) return -1;
+        
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            ps = conn.prepareStatement(
+                "SELECT TOP 1 id_transaction FROM Transaksi WHERE id_customer = ? ORDER BY tanggal_transaksi DESC"
+            );
+            ps.setString(1, idCustomer);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id_transaction");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getLastTransactionId: " + e.getMessage());
+        } finally {
+            closeQuietly(rs); closeQuietly(ps); closeQuietly(conn);
+        }
+        return -1;
+    }
+
+    // ================= GET SHIPMENT INFO =================
+    public static Object[] getShipmentInfo(int idTransaction) {
+        Connection conn = DatabaseHelper.getConnection();
+        if (conn == null) return null;
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            ps = conn.prepareStatement(
+                "SELECT id_shipment, alamat, tanggal_kirim, status_kirim, nama_jasa_kirim, resi, ongkir " +
+                "FROM Shipment WHERE id_transaction = ?"
+            );
+            ps.setInt(1, idTransaction);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Object[] {
+                    rs.getString("id_shipment"),
+                    rs.getString("alamat"),
+                    rs.getDate("tanggal_kirim"),
+                    rs.getString("status_kirim"),
+                    rs.getString("nama_jasa_kirim"),
+                    rs.getString("resi"),
+                    rs.getDouble("ongkir")
+                };
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getShipmentInfo: " + e.getMessage());
+        } finally {
+            closeQuietly(rs); closeQuietly(ps); closeQuietly(conn);
+        }
+        return null;
+    }
+
+    // ================= UPDATE SHIPMENT AND TRANSACTION STATUS =================
+    public static boolean updateShipmentAndTransactionStatus(int idTransaction, String status) {
+        Connection conn = DatabaseHelper.getConnection();
+        if (conn == null) return false;
+
+        PreparedStatement psShip = null;
+        PreparedStatement psTrans = null;
+        try {
+            conn.setAutoCommit(false);
+
+            // Update Shipment status
+            psShip = conn.prepareStatement("UPDATE Shipment SET status_kirim = ? WHERE id_transaction = ?");
+            psShip.setString(1, status);
+            psShip.setInt(2, idTransaction);
+            psShip.executeUpdate();
+
+            // Update Transaksi status
+            psTrans = conn.prepareStatement("UPDATE Transaksi SET status_pengiriman = ? WHERE id_transaction = ?");
+            psTrans.setString(1, status);
+            psTrans.setInt(2, idTransaction);
+            psTrans.executeUpdate();
+
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            System.err.println("Error updateShipmentAndTransactionStatus: " + e.getMessage());
+            try { conn.rollback(); } catch (SQLException ex) {}
+            return false;
+        } finally {
+            closeQuietly(psShip); closeQuietly(psTrans);
+            try { conn.setAutoCommit(true); } catch (SQLException e) {}
+            closeQuietly(conn);
+        }
     }
 
     // ================= HELPERS =================

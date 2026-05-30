@@ -30,7 +30,8 @@ CREATE TABLE Product (
     harga DECIMAL(12,2),
     stok INT,
     ukuran VARCHAR(50),
-    warna VARCHAR(50)
+    warna VARCHAR(50),
+    terjual INT DEFAULT 0
 );
 
 CREATE TABLE Product_Category (
@@ -90,16 +91,17 @@ CREATE TABLE Invoices (
 
 CREATE TABLE Shipment (
     id_shipment VARCHAR(50) PRIMARY KEY,
-    id_order VARCHAR(50),
+    id_transaction INT,
     alamat TEXT,
     tanggal_kirim DATE,
-    status_kirim VARCHAR(100),
+    status_kirim VARCHAR(100) DEFAULT 'sedang dikirim',
     nama_jasa_kirim VARCHAR(100),
     resi VARCHAR(100),
     ongkir DECIMAL(12,2),
 
-    FOREIGN KEY (id_order)
-    REFERENCES Orders(id_order)
+    FOREIGN KEY (id_transaction)
+    REFERENCES Transaction(id_transaction)
+    ON DELETE CASCADE
 );
 
 CREATE TABLE Cart (
@@ -129,6 +131,7 @@ CREATE TABLE Transaction (
     uang_dibayar DECIMAL(12,2) NOT NULL,
     kembalian DECIMAL(12,2) NOT NULL,
     tanggal_transaksi DATETIME NOT NULL,
+    status_pengiriman VARCHAR(100) DEFAULT 'sedang dikirim',
 
     CONSTRAINT FK_Transaction_Customer
         FOREIGN KEY (id_customer)

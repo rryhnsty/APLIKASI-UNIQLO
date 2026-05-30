@@ -39,6 +39,12 @@ public class PaymentView extends JFrame {
     // Flag: true setelah transaksi DB berhasil dan popup ditutup
     private boolean sudahBayar = false;
 
+    private JComboBox<String> courierCombo;
+    private JLabel subtotalValLabel;
+    private JLabel ongkirValLabel;
+    private JLabel grandTotalValLabel;
+    private double currentOngkir = 0;
+
     private static final Color COLOR_RED_BRAND    = new Color(200, 30, 40);
     private static final Color COLOR_RED_HOVER    = new Color(160, 20, 30);
     private static final Color COLOR_GREEN_BRAND  = new Color(34, 139, 34);
@@ -187,19 +193,67 @@ public class PaymentView extends JFrame {
         rightPanel.add(new JSeparator());
         rightPanel.add(Box.createVerticalStrut(20));
 
-        // Total Belanja
-        JLabel subtotalLabelText = new JLabel("TOTAL BELANJA");
-        subtotalLabelText.setFont(new Font("Arial", Font.BOLD, 12));
-        subtotalLabelText.setForeground(COLOR_TEXT_GRAY);
-        subtotalLabelText.setAlignmentX(Component.LEFT_ALIGNMENT);
-        rightPanel.add(subtotalLabelText);
+        // Kurir Dropdown
+        JLabel courierLabelText = new JLabel("PILIH JASA KIRIM (KURIR)");
+        courierLabelText.setFont(new Font("Arial", Font.BOLD, 12));
+        courierLabelText.setForeground(Color.BLACK);
+        courierLabelText.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rightPanel.add(courierLabelText);
+        rightPanel.add(Box.createVerticalStrut(8));
 
+        String[] couriers = {"J&T Express", "JNE Express", "SiCepat", "Anteraja"};
+        courierCombo = new JComboBox<>(couriers);
+        courierCombo.setFont(new Font("Arial", Font.PLAIN, 14));
+        courierCombo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        courierCombo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        courierCombo.addActionListener(ev -> {
+            updateTotals(courierCombo.getSelectedItem().toString());
+        });
+        rightPanel.add(courierCombo);
+        rightPanel.add(Box.createVerticalStrut(20));
+
+        // Rincian Harga
+        JPanel priceDetailGrid = new JPanel(new GridLayout(3, 2, 10, 10));
+        priceDetailGrid.setOpaque(false);
+        priceDetailGrid.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel lblSub = new JLabel("Subtotal Belanja :");
+        lblSub.setFont(new Font("Arial", Font.PLAIN, 14));
+        subtotalValLabel = new JLabel("Rp 0");
+        subtotalValLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        subtotalValLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        JLabel lblOng = new JLabel("Ongkos Kirim :");
+        lblOng.setFont(new Font("Arial", Font.PLAIN, 14));
+        ongkirValLabel = new JLabel("Rp 0");
+        ongkirValLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        ongkirValLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        JLabel lblGrand = new JLabel("TOTAL DIBAYARKAN :");
+        lblGrand.setFont(new Font("Arial", Font.BOLD, 14));
+        lblGrand.setForeground(COLOR_RED_BRAND);
+        grandTotalValLabel = new JLabel("Rp 0");
+        grandTotalValLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        grandTotalValLabel.setForeground(COLOR_RED_BRAND);
+        grandTotalValLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        priceDetailGrid.add(lblSub);
+        priceDetailGrid.add(subtotalValLabel);
+        priceDetailGrid.add(lblOng);
+        priceDetailGrid.add(ongkirValLabel);
+        priceDetailGrid.add(lblGrand);
+        priceDetailGrid.add(grandTotalValLabel);
+
+        rightPanel.add(priceDetailGrid);
+        rightPanel.add(Box.createVerticalStrut(20));
+
+        // Total Belanja Label (Large)
         totalLabel = new JLabel("Rp 0");
         totalLabel.setFont(new Font("Arial", Font.BOLD, 32));
         totalLabel.setForeground(COLOR_RED_BRAND);
         totalLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         rightPanel.add(totalLabel);
-        rightPanel.add(Box.createVerticalStrut(30));
+        rightPanel.add(Box.createVerticalStrut(20));
 
         // Input Nominal
         JLabel cashLabelText = new JLabel("MASUKKAN NOMINAL UANG BAYAR (RP)");
@@ -219,12 +273,9 @@ public class PaymentView extends JFrame {
             BorderFactory.createEmptyBorder(5, 12, 5, 12)
         ));
         rightPanel.add(cashInputField);
-        rightPanel.add(Box.createVerticalStrut(35));
+        rightPanel.add(Box.createVerticalStrut(30));
 
         // ================= TOMBOL UTAMA =================
-        // Tombol ini punya DUA fungsi tergantung flag sudahBayar:
-        //   false → "Bayar Sekarang"   (merah)
-        //   true  → "Lihat Status Pengiriman" (hijau)
         payButton = new JButton("Bayar Sekarang");
         payButton.setFont(new Font("Arial", Font.BOLD, 16));
         payButton.setForeground(Color.WHITE);
@@ -238,7 +289,6 @@ public class PaymentView extends JFrame {
         payButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                // Warna hover menyesuaikan state tombol saat itu
                 payButton.setBackground(sudahBayar ? COLOR_GREEN_HOVER : COLOR_RED_HOVER);
             }
             @Override
@@ -249,11 +299,10 @@ public class PaymentView extends JFrame {
 
         payButton.addActionListener(e -> {
             if (sudahBayar) {
-                // State SETELAH bayar: buka ShipmentView
-                new ShipmentView(customerId, grandTotal, finalUang, finalKembal).setVisible(true);
+                int idTrans = CartDataAccess.getLastTransactionId(customerId);
+                new ShipmentView(customerId, grandTotal, finalUang, finalKembal, idTrans).setVisible(true);
                 dispose();
             } else {
-                // State SEBELUM bayar: proses pembayaran
                 handlePayment();
             }
         });
@@ -298,7 +347,30 @@ public class PaymentView extends JFrame {
         }
 
         totalItemLabel.setText(totalQty + " Pcs");
-        totalLabel.setText(formatRupiah((long) grandTotal));
+        updateTotals(courierCombo.getSelectedItem().toString());
+    }
+
+    // ================= UPDATE TOTALS =================
+    private void updateTotals(String courier) {
+        if ("JNE Express".equals(courier)) {
+            currentOngkir = 15000;
+        } else if ("J&T Express".equals(courier)) {
+            currentOngkir = 10000;
+        } else if ("SiCepat".equals(courier)) {
+            currentOngkir = 12000;
+        } else if ("Anteraja".equals(courier)) {
+            currentOngkir = 8000;
+        } else {
+            currentOngkir = 0;
+        }
+
+        double totalHarusBayar = grandTotal + currentOngkir;
+        if (subtotalValLabel != null) {
+            subtotalValLabel.setText(formatRupiah((long) grandTotal));
+            ongkirValLabel.setText(formatRupiah((long) currentOngkir));
+            grandTotalValLabel.setText(formatRupiah((long) totalHarusBayar));
+        }
+        totalLabel.setText(formatRupiah((long) totalHarusBayar));
     }
 
     // ================= PROSES PEMBAYARAN =================
@@ -336,33 +408,40 @@ public class PaymentView extends JFrame {
             return;
         }
 
+        double grandTotalPayment = grandTotal + currentOngkir;
+
         // Validasi: uang harus cukup
-        if (uangDibayar < grandTotal) {
-            double kurang = grandTotal - uangDibayar;
+        if (uangDibayar < grandTotalPayment) {
+            double kurang = grandTotalPayment - uangDibayar;
             JOptionPane.showMessageDialog(this,
-                "Uang yang dibayarkan kurang dari total belanja!\nKekurangan: " + formatRupiah((long) kurang),
+                "Uang yang dibayarkan kurang dari total belanja + ongkir!\nKekurangan: " + formatRupiah((long) kurang),
                 "Pembayaran Gagal",
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        double kembalian = uangDibayar - grandTotal;
+        double kembalian = uangDibayar - grandTotalPayment;
+        String selectedCourier = courierCombo.getSelectedItem().toString();
 
         // Jalankan SQL Transaction secara atomic via DAO
         boolean isSuccess = CartDataAccess.processPaymentTransaction(
-                customerId, grandTotal, uangDibayar, kembalian);
+                customerId, grandTotal, uangDibayar, kembalian, selectedCourier, currentOngkir);
 
         if (isSuccess) {
-
             // Simpan nilai agar bisa dikirim ke ShipmentView nantinya
             finalUang   = uangDibayar;
             finalKembal = kembalian;
 
-            // ── Popup bukti pembayaran (tetap seperti aslinya) ──────────────
+            // Nonaktifkan kurir selection
+            courierCombo.setEnabled(false);
+
+            // ── Popup bukti pembayaran ──────────────
             String message = "BUKTI PEMBAYARAN SUKSES\n"
                     + "-----------------------------\n"
                     + "Customer ID  : " + customerId + "\n"
-                    + "Total Belanja: " + formatRupiah((long) grandTotal) + "\n"
+                    + "Subtotal     : " + formatRupiah((long) grandTotal) + "\n"
+                    + "Ongkos Kirim : " + formatRupiah((long) currentOngkir) + " (" + selectedCourier + ")\n"
+                    + "Total Bayar  : " + formatRupiah((long) grandTotalPayment) + "\n"
                     + "Uang Dibayar : " + formatRupiah((long) uangDibayar) + "\n"
                     + "Kembalian    : " + formatRupiah((long) kembalian) + "\n"
                     + "-----------------------------\n"

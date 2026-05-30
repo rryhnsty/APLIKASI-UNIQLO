@@ -3,6 +3,7 @@ package Program;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
 
 /**
@@ -29,6 +30,8 @@ public class DatabaseHelper {
     // Set true untuk menggunakan MySQL, false untuk SQL Server
     private static final boolean USE_MYSQL = false; 
 
+    private static boolean schemaInitialized = false;
+
     // ================= GET CONNECTION =================
     public static Connection getConnection() {
         Connection conn = null;
@@ -42,6 +45,11 @@ public class DatabaseHelper {
                 Class.forName(SQLSERVER_DRIVER);
                 conn = DriverManager.getConnection(SQLSERVER_URL, SQLSERVER_USER, SQLSERVER_PASS);
             }
+
+            if (conn != null && !schemaInitialized) {
+                initializeDatabaseSchema(conn);
+                schemaInitialized = true;
+            }
         } catch (ClassNotFoundException e) {
             System.err.println("Driver tidak ditemukan: " + e.getMessage());
             JOptionPane.showMessageDialog(null, 
@@ -54,5 +62,63 @@ public class DatabaseHelper {
                 "Database Connection Error", JOptionPane.ERROR_MESSAGE);
         }
         return conn;
+    }
+
+    private static void initializeDatabaseSchema(Connection conn) {
+        Statement stmt = null;
+        try {
+            stmt = conn.createStatement();
+            
+            // 1. Cek & tambah kolom terjual di Product
+            stmt.execute(
+                "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Product') AND name = 'terjual') " +
+                "BEGIN " +
+                "    ALTER TABLE Product ADD terjual INT DEFAULT 0; " +
+                "END"
+            );
+
+            // 2. Cek & tambah kolom status_pengiriman di Transaksi
+            stmt.execute(
+                "IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Transaksi') AND name = 'status_pengiriman') " +
+                "BEGIN " +
+                "    ALTER TABLE Transaksi ADD status_pengiriman VARCHAR(100) DEFAULT 'sedang dikirim'; " +
+                "END"
+            );
+
+            // 3. Cek & buat ulang tabel Shipment jika masih menggunakan skema lama (id_order)
+            stmt.execute(
+                "IF EXISTS (SELECT * FROM sys.tables WHERE name = 'Shipment') " +
+                "BEGIN " +
+                "    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Shipment') AND name = 'id_transaction') " +
+                "    BEGIN " +
+                "        DROP TABLE Shipment; " +
+                "    END " +
+                "END"
+            );
+
+            // 4. Buat tabel Shipment baru jika belum ada
+            stmt.execute(
+                "IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Shipment') " +
+                "BEGIN " +
+                "    CREATE TABLE Shipment ( " +
+                "        id_shipment VARCHAR(50) PRIMARY KEY, " +
+                "        id_transaction INT, " +
+                "        alamat TEXT, " +
+                "        tanggal_kirim DATE, " +
+                "        status_kirim VARCHAR(100) DEFAULT 'sedang dikirim', " +
+                "        nama_jasa_kirim VARCHAR(100), " +
+                "        resi VARCHAR(100), " +
+                "        ongkir DECIMAL(12,2), " +
+                "        FOREIGN KEY (id_transaction) REFERENCES Transaksi(id_transaction) ON DELETE CASCADE " +
+                "    ); " +
+                "END"
+            );
+        } catch (SQLException e) {
+            System.err.println("Error saat inisialisasi skema database: " + e.getMessage());
+        } finally {
+            if (stmt != null) {
+                try { stmt.close(); } catch (SQLException ignored) {}
+            }
+        }
     }
 }

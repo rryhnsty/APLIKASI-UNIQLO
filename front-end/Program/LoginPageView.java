@@ -319,9 +319,8 @@ public class LoginPageView extends JFrame {
                     JOptionPane.showMessageDialog(this,
                         "Login Admin berhasil!\nSelamat datang, " + email,
                         "Sukses", JOptionPane.INFORMATION_MESSAGE);
-                    // TODO: buka halaman dashboard admin
-                    // new AdminDashboard().setVisible(true);
-                    // dispose();
+                    new AdminDashboardView(email).setVisible(true);
+                    dispose();
                 } else {
                     JOptionPane.showMessageDialog(this,
                         "Email atau password admin salah.", "Login Gagal", JOptionPane.ERROR_MESSAGE);
