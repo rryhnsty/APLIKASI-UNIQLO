@@ -20,18 +20,15 @@ public class HomePageView extends JFrame {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
 
-        // ================= NAVBAR =================
 
         JPanel navbar = new JPanel(new BorderLayout());
         navbar.setBackground(Color.WHITE);
         navbar.setBorder(BorderFactory.createEmptyBorder(10,20,10,20));
 
-        // ===== LOGO =====
         ImageIcon logoIcon = new ImageIcon("images/logo-jeki.png");
         Image logoImg = logoIcon.getImage().getScaledInstance(90, 40, Image.SCALE_SMOOTH);
         JLabel logo = new JLabel(new ImageIcon(logoImg));
 
-        // ===== SEARCH FIELD =====
         JTextField searchField = new JTextField("Cari produk atau kategori...");
         searchField.setPreferredSize(new Dimension(500,40));
 
@@ -40,20 +37,16 @@ public class HomePageView extends JFrame {
                 BorderFactory.createEmptyBorder(0,15,0,15)
         ));
 
-        // ===== PANEL SEARCH =====
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(Color.WHITE);
         centerPanel.setBorder(BorderFactory.createEmptyBorder(0,20,0,20));
 
         centerPanel.add(searchField, BorderLayout.CENTER);
 
-        // ===== PANEL KANAN =====
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT,15,0));
         rightPanel.setBackground(Color.WHITE);
 
         Dimension buttonSize = new Dimension(40,40);
-
-        // ================= CART BUTTON =================
 
         ImageIcon cartIcon = new ImageIcon("images/cart.png");
         Image cartImg = cartIcon.getImage().getScaledInstance(24,24,Image.SCALE_SMOOTH);
@@ -66,8 +59,6 @@ public class HomePageView extends JFrame {
         cartButton.setFocusPainted(false);
         cartButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // ================= PROFILE BUTTON =================
-
         ImageIcon profileIcon = new ImageIcon("images/profile.png");
         Image profileImg = profileIcon.getImage().getScaledInstance(24,24,Image.SCALE_SMOOTH);
 
@@ -78,8 +69,6 @@ public class HomePageView extends JFrame {
         profileButton.setContentAreaFilled(false);
         profileButton.setFocusPainted(false);
         profileButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        // ================= HOVER EFFECT =================
 
         cartButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -107,8 +96,6 @@ public class HomePageView extends JFrame {
             }
         });
 
-        // ================= ACTION BUTTON =================
-
         cartButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -126,12 +113,8 @@ public class HomePageView extends JFrame {
             }
         });
 
-        // ===== TAMBAHKAN KE PANEL KANAN =====
-
         rightPanel.add(cartButton);
         rightPanel.add(profileButton);
-
-        // ===== TAMBAHKAN KE NAVBAR =====
 
         navbar.add(logo, BorderLayout.WEST);
         navbar.add(centerPanel, BorderLayout.CENTER);
@@ -139,12 +122,8 @@ public class HomePageView extends JFrame {
 
         mainPanel.add(navbar, BorderLayout.NORTH);
 
-        // ================= CONTENT =================
-
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BorderLayout());
-
-        // ================= HERO SECTION =================
 
         JPanel heroPanel = new JPanel();
         heroPanel.setPreferredSize(new Dimension(1200,300));
@@ -161,8 +140,6 @@ public class HomePageView extends JFrame {
         heroPanel.add(heroText);
 
         contentPanel.add(heroPanel, BorderLayout.NORTH);
-
-        // ================= PRODUCT GRID =================
 
         JPanel productGrid = new JPanel(new GridLayout(0,4,20,20));
         productGrid.setBackground(new Color(245,245,245));
