@@ -1,7 +1,7 @@
 USE Uniqlo;
 GO
 
--- QUERY A: 5 produk dengan penjualan tertinggi
+
 SELECT TOP 5
     p.id_product,
     p.nama_produk,
@@ -15,7 +15,7 @@ GROUP BY p.id_product, p.nama_produk
 ORDER BY total_terjual DESC;
 GO
 
--- QUERY B: 5 customer dengan total belanja tertinggi
+
 SELECT TOP 5
     c.id_customer,
     c.nama,
@@ -29,7 +29,7 @@ GROUP BY c.id_customer, c.nama, c.email
 ORDER BY total_belanja DESC;
 GO
 
--- QUERY C: 3 produk yang paling sering dibeli bersamaan dengan P001 (HeatTech Ultra Warm T-Shirt)
+
 SELECT TOP 3
     p.id_product,
     p.nama_produk,
@@ -44,7 +44,7 @@ GROUP BY p.id_product, p.nama_produk
 ORDER BY frekuensi_beli_bareng DESC;
 GO
 
--- VIEW 1: Ringkasan order per customer
+
 CREATE VIEW vw_RingkasanOrder AS
 SELECT
     c.id_customer,
@@ -77,7 +77,7 @@ JOIN OrderDetail od ON od.id_order   = o.id_order
 JOIN Product     p  ON p.id_product  = od.id_product;
 GO
 
--- STORED PROCEDURE: Buat order baru saat checkout
+
 CREATE PROCEDURE sp_BuatOrder
     @id_order       VARCHAR(50),
     @id_customer    VARCHAR(50),
@@ -100,7 +100,6 @@ BEGIN
 END;
 GO
 
--- FUNCTION: Hitung total belanja seorang customer
 CREATE FUNCTION fn_TotalBelanjaCustomer(@id_customer VARCHAR(50))
 RETURNS DECIMAL(12,2)
 AS
