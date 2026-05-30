@@ -50,14 +50,14 @@ public class ProfileView extends JFrame {
 
         mainPanel.add(header, BorderLayout.NORTH);
 
-        // ================= CONTENT =================
+      
 
         JPanel content = new JPanel();
         content.setBackground(Color.WHITE);
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setBorder(new EmptyBorder(20,40,20,40));
 
-        // ================= PROFILE CARD =================
+       
 
         JPanel profileCard = new JPanel(new FlowLayout(FlowLayout.LEFT,20,20));
         profileCard.setBackground(Color.WHITE);
