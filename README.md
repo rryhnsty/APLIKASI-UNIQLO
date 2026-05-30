@@ -87,10 +87,10 @@ Dashboard Admin merupakan halaman utama yang ditampilkan setelah administrator b
 9. Section 1 – Menampilkan 5 Produk Terlaris Sepanjang Waktu
 Section ini digunakan untuk menampilkan lima produk dengan jumlah penjualan tertinggi sejak sistem digunakan. Data ditampilkan dalam bentuk tabel yang berisi ranking, nama produk, total penjualan, dan total pendapatan yang dihasilkan.
 
-        Tujuan:
-       - Mengetahui produk paling populer
-       - Membantu pengambilan keputusan stok
-       - Membantu strategi promosi produk
+      Tujuan:
+      - Mengetahui produk paling populer
+      - Membantu pengambilan keputusan stok
+      - Membantu strategi promosi produk
 
 10. Section 2 – Menampilkan 5 Produk Terlaris Bulan Ini
 Section ini menampilkan lima produk dengan penjualan tertinggi dalam periode satu bulan terakhir. Data yang ditampilkan terdiri dari ranking, nama produk, jumlah terjual, dan kategori produk.
