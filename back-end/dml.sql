@@ -1,8 +1,6 @@
 USE Uniqlo;
 
--- ======================
--- ADMIN
--- ======================
+
 INSERT INTO Admin VALUES
 ('ADM001','Ahmad Fathi Al Ghifari','gift.admin01@uniqlo.co.id','NAVIAmybinigweh','081234500001'),
 ('ADM002','Faeyza Safa Izz Deyardi','feza.admin02@uniqlo.co.id','gajiprogrammerdiindo','082345600002'),
@@ -10,18 +8,14 @@ INSERT INTO Admin VALUES
 ('ADM004','Muhammad Zaki Arif Effendi','jeki.admin04@uniqlo.co.id','masambamainnyahebatsekali','084567800004'),
 ('ADM005','Raven Ravellyn Sulistyo','raven.admin05@uniqlo.co.id','admin123','085678900005');
 
--- ======================
--- CATEGORY
--- ======================
+
 INSERT INTO Category VALUES
 ('CAT001','Pakaian Kasual'),
 ('CAT002','Aksesori Kepala'),
 ('CAT003','Aksesori Lainnya'),
 ('CAT004','Pakaian Olahraga');
 
--- ======================
--- PRODUCT (20)
--- ======================
+
 INSERT INTO Product VALUES
 ('P001','HeatTech Ultra Warm Crew Neck T-Shirt','Kaos dalam berbahan HeatTech untuk menghangatkan tubuh di cuaca dingin.',299000,120,'M','Hitam'),
 ('P002','Ultra Light Down Jacket','Jaket ringan dengan teknologi Ultra Light Down, mudah dilipat dan dibawa.',799000,85,'L','Navy'),
@@ -44,9 +38,7 @@ INSERT INTO Product VALUES
 ('P019','Mini Shoulder Bag','Tas selempang mini.',299000,130,'All','Hitam'),
 ('P020','HeatTech Leggings','Legging HeatTech.',349000,160,'M','Hitam');
 
--- ======================
--- CUSTOMER (FULL 50)
--- ======================
+
 INSERT INTO Customer VALUES
 ('C001','Barbara Pegg','barbara.pegg@gmail.com','barbara123','Jl. Soekarno Hatta No.12, Malang','081234567890'),
 ('C002','Kaeya Alberich','kaeya.alberich@gmail.com','kaeya123','Jl. Veteran No.45, Banjarbaru','081298765432'),
@@ -100,9 +92,7 @@ INSERT INTO Customer VALUES
 ('C050','Xilonen','xilonen@gmail.com','xilonen123','Jl. Raya Fatmawati No.15, Jakarta Selatan','081789012345');
 
 
--- ======================
--- ORDERS (50 DATA)
--- ======================
+
 INSERT INTO Orders VALUES
 ('ORD001','2025-10-02',598000,'Selesai'),
 ('ORD002','2025-10-05',799000,'Selesai'),
@@ -155,9 +145,6 @@ INSERT INTO Orders VALUES
 ('ORD049','2026-02-28',298000,'Belum Selesai'),
 ('ORD050','2026-03-03',298000,'Belum Selesai');
 
--- ======================
--- ORDER DETAIL (50 DATA)
--- ======================
 INSERT INTO OrderDetail VALUES
 ('ORD001','P001',299000,2,598000),
 ('ORD002','P002',799000,1,799000),
@@ -212,9 +199,6 @@ INSERT INTO OrderDetail VALUES
 
 
 
--- ======================
--- PAYMENT (50 DATA)
--- ======================
 INSERT INTO Payment VALUES
 ('PAY001','Jl. Soekarno Hatta No.12, Malang','Gopay','2025-10-03','J&T Express','Lunas',598000),
 ('PAY002','Jl. Veteran No.45, Banjarbaru','Dana','2025-10-06','J&T Express','Lunas',799000),
@@ -267,9 +251,7 @@ INSERT INTO Payment VALUES
 ('PAY049','Jl. Raya Pondok Indah No.6, Jakarta Selatan','Cash on Delivery',NULL,'SiCepat','Belum Lunas',298000),
 ('PAY050','Jl. Raya Fatmawati No.15, Jakarta Selatan','Cash on Delivery',NULL,'SiCepat','Belum Lunas',298000);
 
--- ======================
--- INVOICES (50 DATA)
--- ======================
+
 INSERT INTO Invoices VALUES
 ('INV001','2025-10-02','Jl. Soekarno Hatta No.12, Malang',598000,'Lunas','J&T Express'),
 ('INV002','2025-10-05','Jl. Veteran No.45, Banjarbaru',799000,'Lunas','J&T Express'),
@@ -322,9 +304,7 @@ INSERT INTO Invoices VALUES
 ('INV049','2026-02-28','Jl. Raya Pondok Indah No.6, Jakarta Selatan',298000,'Belum Lunas','SiCepat'),
 ('INV050','2026-03-03','Jl. Raya Fatmawati No.15, Jakarta Selatan',298000,'Belum Lunas','SiCepat');
 
--- ======================
--- SHIPMENT (FULL 50)
--- ======================
+
 INSERT INTO Shipment VALUES
 ('SHP001','ORD001','Jl. Soekarno Hatta No.12, Malang','2025-12-06','Tiba di Tujuan','J&T Express','JT6022768040',5000),
 ('SHP002','ORD002','Jl. Veteran No.45, Banjarbaru','2025-12-19','Tiba di Tujuan','J&T Express','JT2501652580',5000),
@@ -386,10 +366,10 @@ SELECT * FROM Product;
 
 SELECT * FROM Customer;
 
---untuk cek pengantaran barang yang dipesan
+
 SELECT * FROM Shipment;
 
 SELECT * FROM Invoices
 
---untuk cek Transaksi
+
 SELECT * FROM Transaksi
