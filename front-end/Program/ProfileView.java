@@ -112,9 +112,7 @@ public class ProfileView extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1;
 
-        // ===== ROW 1 =====
-
-        // NAMA
+        
         gbc.gridx = 0;
         gbc.gridy = 0;
         formPanel.add(new JLabel("NAMA"), gbc);
@@ -123,9 +121,7 @@ public class ProfileView extends JFrame {
         gbc.gridx = 1;
         formPanel.add(new JLabel("NOMOR TELEPON"), gbc);
 
-        // ===== ROW 2 =====
-
-        // namaField
+        
         gbc.gridx = 0;
         gbc.gridy = 1;
         namaField = new JTextField();
