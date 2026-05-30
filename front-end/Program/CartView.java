@@ -30,8 +30,6 @@ public class CartView extends JFrame {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
-        // ================= HEADER =================
-
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(Color.WHITE);
         headerPanel.setBorder(new EmptyBorder(20,20,20,20));
@@ -49,8 +47,6 @@ public class CartView extends JFrame {
         headerPanel.add(backButton, BorderLayout.EAST);
 
         mainPanel.add(headerPanel, BorderLayout.NORTH);
-
-        // ================= CART CONTENT =================
 
         cartContainer = new JPanel();
         cartContainer.setLayout(new BoxLayout(cartContainer, BoxLayout.Y_AXIS));
